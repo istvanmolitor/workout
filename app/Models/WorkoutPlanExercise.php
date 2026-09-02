@@ -7,19 +7,18 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $workout_plan_id
  * @property int $exercise_id
- * @property int $sets
- * @property int $reps
  * @property int $order
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['workout_plan_id', 'exercise_id', 'sets', 'reps', 'order'])]
+#[Fillable(['workout_plan_id', 'exercise_id', 'order'])]
 class WorkoutPlanExercise extends Model
 {
     /** @use HasFactory<WorkoutPlanExerciseFactory> */
@@ -43,5 +42,15 @@ class WorkoutPlanExercise extends Model
     public function exercise(): BelongsTo
     {
         return $this->belongsTo(Exercise::class);
+    }
+
+    /**
+     * Get the sets planned for this exercise.
+     *
+     * @return HasMany<WorkoutPlanExerciseSet, $this>
+     */
+    public function sets(): HasMany
+    {
+        return $this->hasMany(WorkoutPlanExerciseSet::class)->orderBy('order');
     }
 }

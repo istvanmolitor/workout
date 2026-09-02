@@ -22,7 +22,7 @@ class Edit extends Component
     public string $description = '';
 
     /**
-     * @var array<int, array{exercise_id: int|string, sets: int|string, reps: int|string}>
+     * @var array<int, array{exercise_id: int|string, sets: array<int, array{reps: int|string, weight: int|string|null}>}>
      */
     public array $exercises = [];
 
@@ -39,8 +39,7 @@ class Edit extends Component
         $this->exercises = $workoutPlan->exercises
             ->map(fn ($exercise) => [
                 'exercise_id' => $exercise->exercise_id,
-                'sets' => $exercise->sets,
-                'reps' => $exercise->reps,
+                'sets' => $exercise->sets->map(fn ($set) => ['reps' => $set->reps, 'weight' => $set->weight])->all(),
             ])
             ->all();
     }
@@ -61,7 +60,7 @@ class Edit extends Component
      */
     public function addExercise(): void
     {
-        $this->exercises[] = ['exercise_id' => '', 'sets' => 3, 'reps' => 10];
+        $this->exercises[] = ['exercise_id' => '', 'sets' => [['reps' => 10, 'weight' => null], ['reps' => 10, 'weight' => null], ['reps' => 10, 'weight' => null]]];
     }
 
     /**
@@ -72,6 +71,24 @@ class Edit extends Component
         unset($this->exercises[$index]);
 
         $this->exercises = array_values($this->exercises);
+    }
+
+    /**
+     * Add an empty set row to an exercise.
+     */
+    public function addSet(int $exerciseIndex): void
+    {
+        $this->exercises[$exerciseIndex]['sets'][] = ['reps' => 10, 'weight' => null];
+    }
+
+    /**
+     * Remove a set row from an exercise.
+     */
+    public function removeSet(int $exerciseIndex, int $setIndex): void
+    {
+        unset($this->exercises[$exerciseIndex]['sets'][$setIndex]);
+
+        $this->exercises[$exerciseIndex]['sets'] = array_values($this->exercises[$exerciseIndex]['sets']);
     }
 
     /**
@@ -86,8 +103,9 @@ class Edit extends Component
             'description' => ['nullable', 'string', 'max:1000'],
             'exercises' => ['required', 'array', 'min:1'],
             'exercises.*.exercise_id' => ['required', 'integer', 'exists:exercises,id'],
-            'exercises.*.sets' => ['required', 'integer', 'min:1', 'max:99'],
-            'exercises.*.reps' => ['required', 'integer', 'min:1', 'max:999'],
+            'exercises.*.sets' => ['required', 'array', 'min:1'],
+            'exercises.*.sets.*.reps' => ['required', 'integer', 'min:1', 'max:999'],
+            'exercises.*.sets.*.weight' => ['nullable', 'numeric', 'min:0', 'max:9999.99'],
         ]);
 
         $this->workoutPlan->update([
@@ -98,12 +116,18 @@ class Edit extends Component
         $this->workoutPlan->exercises()->delete();
 
         foreach ($validated['exercises'] as $order => $exercise) {
-            $this->workoutPlan->exercises()->create([
+            $planExercise = $this->workoutPlan->exercises()->create([
                 'exercise_id' => $exercise['exercise_id'],
-                'sets' => $exercise['sets'],
-                'reps' => $exercise['reps'],
                 'order' => $order,
             ]);
+
+            foreach ($exercise['sets'] as $setOrder => $set) {
+                $planExercise->sets()->create([
+                    'reps' => $set['reps'],
+                    'weight' => $set['weight'],
+                    'order' => $setOrder,
+                ]);
+            }
         }
 
         Flux::toast(variant: 'success', text: __('Workout plan updated.'));

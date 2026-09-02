@@ -38,9 +38,9 @@
                     @foreach ($workout->exercises as $exercise)
                         <li class="flex items-center justify-between text-sm">
                             <span>{{ $exercise->exercise->name }}</span>
-                            @if ($exercise->completed_sets !== null || $exercise->completed_reps !== null)
+                            @if ($exercise->sets->contains(fn ($set) => $set->completed_reps !== null))
                                 <flux:badge size="sm">
-                                    {{ __(':sets x :reps', ['sets' => $exercise->completed_sets ?? '?', 'reps' => $exercise->completed_reps ?? '?']) }}
+                                    {{ $exercise->sets->map(fn ($set) => ($set->completed_reps ?? '?').($set->completed_weight !== null ? '×'.rtrim(rtrim($set->completed_weight, '0'), '.').'kg' : ''))->join(', ') }}
                                     @if ($exercise->difficulty !== null)
                                         &middot; {{ $exercise->difficulty }}/10
                                     @endif

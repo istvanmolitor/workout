@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Workout;
 use App\Models\WorkoutPlan;
 use App\Models\WorkoutPlanExercise;
+use App\Models\WorkoutPlanExerciseSet;
 use Livewire\Livewire;
 
 test('guests are redirected to the login page', function () {
@@ -34,16 +35,16 @@ test('user only sees their own workout plans', function () {
     expect($ownPlan->user_id)->toBe($user->id);
 });
 
-test('owner can start a workout from a workout plan, copying its exercises', function () {
+test('owner can start a workout from a workout plan, copying its exercises and sets', function () {
     $user = User::factory()->create();
     $workoutPlan = WorkoutPlan::factory()->for($user)->create(['name' => 'Push day']);
     $benchPress = Exercise::factory()->create(['name' => 'Bench press']);
-    WorkoutPlanExercise::factory()->for($workoutPlan)->create([
+    $planExercise = WorkoutPlanExercise::factory()->for($workoutPlan)->create([
         'exercise_id' => $benchPress->id,
-        'sets' => 4,
-        'reps' => 8,
         'order' => 0,
     ]);
+    WorkoutPlanExerciseSet::factory()->for($planExercise, 'workoutPlanExercise')->create(['reps' => 12, 'weight' => 60, 'order' => 0]);
+    WorkoutPlanExerciseSet::factory()->for($planExercise, 'workoutPlanExercise')->create(['reps' => 8, 'weight' => 70, 'order' => 1]);
 
     $this->actingAs($user);
 
@@ -57,8 +58,10 @@ test('owner can start a workout from a workout plan, copying its exercises', fun
     expect($workout->name)->toBe('Push day');
     expect($workout->exercises)->toHaveCount(1);
     expect($workout->exercises->first()->exercise_id)->toBe($benchPress->id);
-    expect($workout->exercises->first()->sets)->toBe(4);
-    expect($workout->exercises->first()->reps)->toBe(8);
+    expect($workout->exercises->first()->sets->pluck('reps')->all())->toBe([12, 8]);
+    expect($workout->exercises->first()->sets->pluck('completed_reps')->all())->toBe([null, null]);
+    expect($workout->exercises->first()->sets->pluck('weight')->map(fn ($weight) => (float) $weight)->all())->toBe([60.0, 70.0]);
+    expect($workout->exercises->first()->sets->pluck('completed_weight')->all())->toBe([null, null]);
 });
 
 test('a user cannot start a workout from another user\'s workout plan', function () {

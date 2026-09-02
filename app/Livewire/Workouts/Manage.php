@@ -20,6 +20,6 @@ class Manage extends Component
     #[Computed]
     public function workouts(): Collection
     {
-        return Auth::user()->workouts()->with('exercises.exercise')->latest('performed_at')->latest()->get();
+        return Auth::user()->workouts()->with('exercises.exercise', 'exercises.sets')->latest('performed_at')->latest()->get();
     }
 }

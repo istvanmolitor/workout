@@ -48,7 +48,9 @@
                     @foreach ($workoutPlan->exercises as $exercise)
                         <li class="flex items-center justify-between text-sm">
                             <span>{{ $exercise->exercise->name }}</span>
-                            <flux:badge size="sm">{{ __(':sets x :reps', ['sets' => $exercise->sets, 'reps' => $exercise->reps]) }}</flux:badge>
+                            <flux:badge size="sm">
+                                {{ $exercise->sets->map(fn ($set) => $set->weight !== null ? "{$set->reps}×".rtrim(rtrim($set->weight, '0'), '.').'kg' : $set->reps)->join(', ') }}
+                            </flux:badge>
                         </li>
                     @endforeach
                 </ul>

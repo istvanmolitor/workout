@@ -4,6 +4,7 @@ namespace App\Livewire\Workouts;
 
 use App\Models\Workout;
 use App\Models\WorkoutExercise;
+use App\Models\WorkoutExerciseSet;
 use Flux\Flux;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
@@ -21,7 +22,7 @@ class Perform extends Component
     public ?int $activeExerciseId = null;
 
     /**
-     * @var array<int, array{completed_sets: int|string|null, completed_reps: int|string|null, difficulty: int|string|null}>
+     * @var array<int, array{sets: array<int, array{reps: int, completed_reps: int|string|null, weight: string|null, completed_weight: int|string|null}>, difficulty: int|string|null}>
      */
     public array $exercises = [];
 
@@ -40,13 +41,21 @@ class Perform extends Component
         $this->authorize('update', $workout);
 
         $this->workout = $workout;
-        $this->workout->load('exercises.exercise');
+        $this->workout->load('exercises.exercise', 'exercises.sets');
 
         $this->exercises = $this->workout->exercises
             ->mapWithKeys(fn (WorkoutExercise $exercise) => [
                 $exercise->id => [
-                    'completed_sets' => $exercise->completed_sets ?? $exercise->sets,
-                    'completed_reps' => $exercise->completed_reps ?? $exercise->reps,
+                    'sets' => $exercise->sets
+                        ->mapWithKeys(fn (WorkoutExerciseSet $set) => [
+                            $set->id => [
+                                'reps' => $set->reps,
+                                'completed_reps' => $set->completed_reps ?? $set->reps,
+                                'weight' => $set->weight,
+                                'completed_weight' => $set->completed_weight ?? $set->weight,
+                            ],
+                        ])
+                        ->all(),
                     'difficulty' => $exercise->difficulty,
                 ],
             ])
@@ -54,7 +63,7 @@ class Perform extends Component
 
         $this->logged = $this->workout->exercises
             ->mapWithKeys(fn (WorkoutExercise $exercise) => [
-                $exercise->id => $exercise->completed_sets !== null,
+                $exercise->id => $exercise->sets->isNotEmpty() && $exercise->sets->every(fn (WorkoutExerciseSet $set) => $set->completed_reps !== null),
             ])
             ->all();
     }
@@ -85,12 +94,21 @@ class Perform extends Component
         $workoutExerciseId = $this->activeExerciseId;
 
         $validated = $this->validate([
-            "exercises.{$workoutExerciseId}.completed_sets" => ['nullable', 'integer', 'min:0', 'max:99'],
-            "exercises.{$workoutExerciseId}.completed_reps" => ['nullable', 'integer', 'min:0', 'max:999'],
+            "exercises.{$workoutExerciseId}.sets.*.completed_reps" => ['nullable', 'integer', 'min:0', 'max:999'],
+            "exercises.{$workoutExerciseId}.sets.*.completed_weight" => ['nullable', 'numeric', 'min:0', 'max:9999.99'],
             "exercises.{$workoutExerciseId}.difficulty" => ['nullable', 'integer', 'min:1', 'max:10'],
         ]);
 
-        $this->workout->exercises()->whereKey($workoutExerciseId)->update($validated['exercises'][$workoutExerciseId]);
+        foreach ($validated['exercises'][$workoutExerciseId]['sets'] as $setId => $set) {
+            WorkoutExerciseSet::query()->whereKey($setId)->update([
+                'completed_reps' => $set['completed_reps'],
+                'completed_weight' => $set['completed_weight'],
+            ]);
+        }
+
+        $this->workout->exercises()->whereKey($workoutExerciseId)->update([
+            'difficulty' => $validated['exercises'][$workoutExerciseId]['difficulty'],
+        ]);
 
         $this->logged[$workoutExerciseId] = true;
         $this->activeExerciseId = null;

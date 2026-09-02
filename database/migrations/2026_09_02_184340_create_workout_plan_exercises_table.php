@@ -15,8 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('workout_plan_id')->constrained()->cascadeOnDelete();
             $table->foreignId('exercise_id')->constrained()->restrictOnDelete();
-            $table->unsignedInteger('sets');
-            $table->unsignedInteger('reps');
             $table->unsignedInteger('order')->default(0);
             $table->timestamps();
 

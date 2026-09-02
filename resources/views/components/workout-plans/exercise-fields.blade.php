@@ -1,19 +1,16 @@
 @props(['exercises', 'availableExercises'])
 
-<div class="space-y-3">
+<div class="space-y-4">
     <flux:label>{{ __('Exercises') }}</flux:label>
 
     @foreach ($exercises as $index => $exercise)
-        <div wire:key="exercise-row-{{ $index }}" class="flex flex-col gap-2 sm:flex-row sm:items-start">
-            <flux:select wire:model="exercises.{{ $index }}.exercise_id" :placeholder="__('Select exercise')" class="min-w-0 sm:flex-1">
-                @foreach ($availableExercises as $availableExercise)
-                    <flux:select.option value="{{ $availableExercise->id }}">{{ $availableExercise->name }}</flux:select.option>
-                @endforeach
-            </flux:select>
-
-            <div class="flex items-start gap-2">
-                <flux:input wire:model="exercises.{{ $index }}.sets" type="number" min="1" :placeholder="__('Sets')" class="w-20" />
-                <flux:input wire:model="exercises.{{ $index }}.reps" type="number" min="1" :placeholder="__('Reps')" class="w-20" />
+        <div wire:key="exercise-row-{{ $index }}" class="space-y-2 rounded-lg border border-zinc-200 p-3 dark:border-zinc-700">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-start">
+                <flux:select wire:model="exercises.{{ $index }}.exercise_id" :placeholder="__('Select exercise')" class="min-w-0 sm:flex-1">
+                    @foreach ($availableExercises as $availableExercise)
+                        <flux:select.option value="{{ $availableExercise->id }}">{{ $availableExercise->name }}</flux:select.option>
+                    @endforeach
+                </flux:select>
 
                 <flux:button
                     type="button"
@@ -23,10 +20,47 @@
                     :disabled="count($exercises) <= 1"
                 />
             </div>
+            <flux:error name="exercises.{{ $index }}.exercise_id" />
+
+            <div class="flex flex-wrap items-start gap-2">
+                @foreach ($exercise['sets'] as $setIndex => $set)
+                    <div wire:key="exercise-row-{{ $index }}-set-{{ $setIndex }}" class="flex items-start gap-1">
+                        <flux:input
+                            wire:model="exercises.{{ $index }}.sets.{{ $setIndex }}.reps"
+                            type="number"
+                            min="1"
+                            :label="__('Set :number', ['number' => $setIndex + 1])"
+                            class="w-20"
+                        />
+
+                        <flux:input
+                            wire:model="exercises.{{ $index }}.sets.{{ $setIndex }}.weight"
+                            type="number"
+                            step="0.5"
+                            min="0"
+                            :label="__('Weight (kg)')"
+                            class="w-24"
+                        />
+
+                        <flux:button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            icon="x-mark"
+                            wire:click="removeSet({{ $index }}, {{ $setIndex }})"
+                            :disabled="count($exercise['sets']) <= 1"
+                        />
+                    </div>
+                    <flux:error name="exercises.{{ $index }}.sets.{{ $setIndex }}.reps" />
+                    <flux:error name="exercises.{{ $index }}.sets.{{ $setIndex }}.weight" />
+                @endforeach
+
+                <flux:button type="button" variant="outline" size="sm" icon="plus" wire:click="addSet({{ $index }})">
+                    {{ __('Add set') }}
+                </flux:button>
+            </div>
+            <flux:error name="exercises.{{ $index }}.sets" />
         </div>
-        <flux:error name="exercises.{{ $index }}.exercise_id" />
-        <flux:error name="exercises.{{ $index }}.sets" />
-        <flux:error name="exercises.{{ $index }}.reps" />
     @endforeach
 
     <flux:button type="button" variant="outline" size="sm" icon="plus" wire:click="addExercise">

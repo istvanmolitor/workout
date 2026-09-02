@@ -20,7 +20,7 @@ class Manage extends Component
     #[Computed]
     public function workoutPlans(): Collection
     {
-        return Auth::user()->workoutPlans()->with('exercises.exercise')->latest()->get();
+        return Auth::user()->workoutPlans()->with('exercises.exercise', 'exercises.sets')->latest()->get();
     }
 
     /**
@@ -37,12 +37,18 @@ class Manage extends Component
         ]);
 
         foreach ($workoutPlan->exercises as $planExercise) {
-            $workout->exercises()->create([
+            $workoutExercise = $workout->exercises()->create([
                 'exercise_id' => $planExercise->exercise_id,
-                'sets' => $planExercise->sets,
-                'reps' => $planExercise->reps,
                 'order' => $planExercise->order,
             ]);
+
+            foreach ($planExercise->sets as $planSet) {
+                $workoutExercise->sets()->create([
+                    'reps' => $planSet->reps,
+                    'weight' => $planSet->weight,
+                    'order' => $planSet->order,
+                ]);
+            }
         }
 
         $this->redirectRoute('workouts.perform', $workout, navigate: true);

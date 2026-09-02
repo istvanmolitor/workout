@@ -2,15 +2,14 @@
 
 namespace Database\Factories;
 
-use App\Models\Exercise;
-use App\Models\WorkoutPlan;
 use App\Models\WorkoutPlanExercise;
+use App\Models\WorkoutPlanExerciseSet;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<WorkoutPlanExercise>
+ * @extends Factory<WorkoutPlanExerciseSet>
  */
-class WorkoutPlanExerciseFactory extends Factory
+class WorkoutPlanExerciseSetFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -20,8 +19,9 @@ class WorkoutPlanExerciseFactory extends Factory
     public function definition(): array
     {
         return [
-            'workout_plan_id' => WorkoutPlan::factory(),
-            'exercise_id' => Exercise::factory(),
+            'workout_plan_exercise_id' => WorkoutPlanExercise::factory(),
+            'reps' => fake()->numberBetween(1, 20),
+            'weight' => fake()->randomFloat(2, 2.5, 100),
             'order' => 0,
         ];
     }

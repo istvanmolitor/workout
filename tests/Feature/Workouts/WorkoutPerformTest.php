@@ -5,6 +5,7 @@ use App\Models\Exercise;
 use App\Models\User;
 use App\Models\Workout;
 use App\Models\WorkoutExercise;
+use App\Models\WorkoutExerciseSet;
 use Livewire\Livewire;
 
 test('guests are redirected to the login page', function () {
@@ -32,22 +33,24 @@ test('a user cannot perform another user\'s workout', function () {
     $this->get(route('workouts.perform', $workout))->assertForbidden();
 });
 
-test('completed sets and reps default to the planned values', function () {
+test('completed reps and weight default to the planned values per set', function () {
     $user = User::factory()->create();
     $workout = Workout::factory()->for($user)->create();
     $exercise = WorkoutExercise::factory()->for($workout)->create([
         'exercise_id' => Exercise::factory()->create(),
-        'sets' => 4,
+    ]);
+    $set = WorkoutExerciseSet::factory()->for($exercise, 'workoutExercise')->create([
         'reps' => 8,
-        'completed_sets' => null,
         'completed_reps' => null,
+        'weight' => 60,
+        'completed_weight' => null,
     ]);
 
     $this->actingAs($user);
 
     Livewire::test(Perform::class, ['workout' => $workout])
-        ->assertSet("exercises.{$exercise->id}.completed_sets", 4)
-        ->assertSet("exercises.{$exercise->id}.completed_reps", 8)
+        ->assertSet("exercises.{$exercise->id}.sets.{$set->id}.completed_reps", 8)
+        ->assertSet("exercises.{$exercise->id}.sets.{$set->id}.completed_weight", '60.00')
         ->assertSet("logged.{$exercise->id}", false);
 });
 
@@ -57,9 +60,11 @@ test('selecting an exercise shows only that exercise', function () {
     $benchPress = WorkoutExercise::factory()->for($workout)->create([
         'exercise_id' => Exercise::factory()->create(['name' => 'Bench press']),
     ]);
-    WorkoutExercise::factory()->for($workout)->create([
+    WorkoutExerciseSet::factory()->for($benchPress, 'workoutExercise')->create();
+    $shoulderPress = WorkoutExercise::factory()->for($workout)->create([
         'exercise_id' => Exercise::factory()->create(['name' => 'Shoulder press']),
     ]);
+    WorkoutExerciseSet::factory()->for($shoulderPress, 'workoutExercise')->create();
 
     $this->actingAs($user);
 
@@ -69,19 +74,23 @@ test('selecting an exercise shows only that exercise', function () {
         ->assertDontSee('Shoulder press');
 });
 
-test('owner can log completed sets, reps and difficulty for the active exercise', function () {
+test('owner can log completed reps, weight and difficulty for the active exercise', function () {
     $user = User::factory()->create();
     $workout = Workout::factory()->for($user)->create();
     $exercise = WorkoutExercise::factory()->for($workout)->create([
         'exercise_id' => Exercise::factory()->create(),
     ]);
+    $firstSet = WorkoutExerciseSet::factory()->for($exercise, 'workoutExercise')->create(['reps' => 8, 'weight' => 40, 'order' => 0]);
+    $secondSet = WorkoutExerciseSet::factory()->for($exercise, 'workoutExercise')->create(['reps' => 6, 'weight' => 45, 'order' => 1]);
 
     $this->actingAs($user);
 
     Livewire::test(Perform::class, ['workout' => $workout])
         ->call('selectExercise', $exercise->id)
-        ->set("exercises.{$exercise->id}.completed_sets", 3)
-        ->set("exercises.{$exercise->id}.completed_reps", 6)
+        ->set("exercises.{$exercise->id}.sets.{$firstSet->id}.completed_reps", 7)
+        ->set("exercises.{$exercise->id}.sets.{$firstSet->id}.completed_weight", 42.5)
+        ->set("exercises.{$exercise->id}.sets.{$secondSet->id}.completed_reps", 5)
+        ->set("exercises.{$exercise->id}.sets.{$secondSet->id}.completed_weight", 47.5)
         ->set("exercises.{$exercise->id}.difficulty", 8)
         ->call('save')
         ->assertHasNoErrors()
@@ -90,8 +99,10 @@ test('owner can log completed sets, reps and difficulty for the active exercise'
 
     $exercise->refresh();
 
-    expect($exercise->completed_sets)->toBe(3);
-    expect($exercise->completed_reps)->toBe(6);
+    expect($firstSet->refresh()->completed_reps)->toBe(7);
+    expect((float) $firstSet->completed_weight)->toBe(42.5);
+    expect($secondSet->refresh()->completed_reps)->toBe(5);
+    expect((float) $secondSet->completed_weight)->toBe(47.5);
     expect($exercise->difficulty)->toBe(8);
 });
 
@@ -101,6 +112,7 @@ test('difficulty must be between 1 and 10', function () {
     $exercise = WorkoutExercise::factory()->for($workout)->create([
         'exercise_id' => Exercise::factory()->create(),
     ]);
+    WorkoutExerciseSet::factory()->for($exercise, 'workoutExercise')->create();
 
     $this->actingAs($user);
 

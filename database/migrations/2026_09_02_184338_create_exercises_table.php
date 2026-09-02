@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('exercises', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->foreignId('category_id')->nullable()->constrained('exercise_categories')->nullOnDelete();
             $table->timestamps();
         });
     }
