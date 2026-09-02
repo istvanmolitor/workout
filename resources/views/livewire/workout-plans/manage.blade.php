@@ -21,13 +21,25 @@
                         @endif
                     </div>
 
-                    <flux:button
-                        variant="ghost"
-                        size="sm"
-                        icon="pencil"
-                        :href="route('workout-plans.edit', $workoutPlan)"
-                        wire:navigate
-                    />
+                    <div class="flex items-center gap-1">
+                        <flux:button
+                            variant="ghost"
+                            size="sm"
+                            icon="play"
+                            wire:click="startWorkout({{ $workoutPlan->id }})"
+                            :disabled="$workoutPlan->exercises->isEmpty()"
+                        >
+                            {{ __('Start workout') }}
+                        </flux:button>
+
+                        <flux:button
+                            variant="ghost"
+                            size="sm"
+                            icon="pencil"
+                            :href="route('workout-plans.edit', $workoutPlan)"
+                            wire:navigate
+                        />
+                    </div>
                 </div>
 
                 <flux:separator />

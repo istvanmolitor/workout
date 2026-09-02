@@ -18,3 +18,18 @@ test('non-owner cannot update the workout plan', function () {
 
     expect((new WorkoutPlanPolicy)->update($user, $workoutPlan))->toBeFalse();
 });
+
+test('owner can view their workout plan', function () {
+    $user = User::factory()->create();
+    $workoutPlan = WorkoutPlan::factory()->for($user)->create();
+
+    expect((new WorkoutPlanPolicy)->view($user, $workoutPlan))->toBeTrue();
+});
+
+test('non-owner cannot view the workout plan', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $workoutPlan = WorkoutPlan::factory()->for($otherUser)->create();
+
+    expect((new WorkoutPlanPolicy)->view($user, $workoutPlan))->toBeFalse();
+});

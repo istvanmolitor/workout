@@ -69,4 +69,14 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->hasMany(WorkoutPlan::class);
     }
+
+    /**
+     * Get the workouts logged by the user.
+     *
+     * @return HasMany<Workout, $this>
+     */
+    public function workouts(): HasMany
+    {
+        return $this->hasMany(Workout::class);
+    }
 }

@@ -8,6 +8,14 @@ use App\Models\WorkoutPlan;
 class WorkoutPlanPolicy
 {
     /**
+     * Determine whether the user can view the model.
+     */
+    public function view(User $user, WorkoutPlan $workoutPlan): bool
+    {
+        return $user->id === $workoutPlan->user_id;
+    }
+
+    /**
      * Determine whether the user can update the model.
      */
     public function update(User $user, WorkoutPlan $workoutPlan): bool

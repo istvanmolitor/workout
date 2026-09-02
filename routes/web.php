@@ -9,6 +9,8 @@ use App\Livewire\Exercises\Manage as ManageExercises;
 use App\Livewire\WorkoutPlans\Create as CreateWorkoutPlan;
 use App\Livewire\WorkoutPlans\Edit as EditWorkoutPlan;
 use App\Livewire\WorkoutPlans\Manage as ManageWorkoutPlans;
+use App\Livewire\Workouts\Edit as EditWorkout;
+use App\Livewire\Workouts\Manage as ManageWorkouts;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
@@ -19,6 +21,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('workout-plans', ManageWorkoutPlans::class)->name('workout-plans.index');
     Route::livewire('workout-plans/create', CreateWorkoutPlan::class)->name('workout-plans.create');
     Route::livewire('workout-plans/{workoutPlan}/edit', EditWorkoutPlan::class)->name('workout-plans.edit');
+
+    Route::livewire('workouts', ManageWorkouts::class)->name('workouts.index');
+    Route::livewire('workouts/{workout}/edit', EditWorkout::class)->name('workouts.edit');
 
     Route::livewire('exercises', ManageExercises::class)->name('exercises.index');
     Route::livewire('exercises/create', CreateExercise::class)->name('exercises.create');

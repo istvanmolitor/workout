@@ -20,6 +20,10 @@
                         {{ __('Workout plans') }}
                     </flux:sidebar.item>
 
+                    <flux:sidebar.item icon="fire" :href="route('workouts.index')" :current="request()->routeIs('workouts.*')" wire:navigate>
+                        {{ __('Workouts') }}
+                    </flux:sidebar.item>
+
                     <flux:sidebar.item icon="list-bullet" :href="route('exercises.index')" :current="request()->routeIs('exercises.*')" wire:navigate>
                         {{ __('Exercises') }}
                     </flux:sidebar.item>
