@@ -13,13 +13,23 @@
                         <flux:text class="mt-1">{{ $workout->performed_at->translatedFormat('Y. m. d.') }}</flux:text>
                     </div>
 
-                    <flux:button
-                        variant="ghost"
-                        size="sm"
-                        icon="pencil"
-                        :href="route('workouts.edit', $workout)"
-                        wire:navigate
-                    />
+                    <div class="flex items-center gap-1">
+                        <flux:button
+                            variant="ghost"
+                            size="sm"
+                            icon="play"
+                            :href="route('workouts.perform', $workout)"
+                            wire:navigate
+                        />
+
+                        <flux:button
+                            variant="ghost"
+                            size="sm"
+                            icon="pencil"
+                            :href="route('workouts.edit', $workout)"
+                            wire:navigate
+                        />
+                    </div>
                 </div>
 
                 <flux:separator />

@@ -45,6 +45,6 @@ class Manage extends Component
             ]);
         }
 
-        $this->redirectRoute('workouts.edit', $workout, navigate: true);
+        $this->redirectRoute('workouts.perform', $workout, navigate: true);
     }
 }
