@@ -13,7 +13,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Security settings')]
+#[Title('Biztonsági beállítások')]
 class Security extends Component
 {
     use PasswordValidationRules;

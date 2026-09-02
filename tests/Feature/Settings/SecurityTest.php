@@ -21,8 +21,8 @@ test('security settings page can be rendered', function () {
 
     $response->assertOk();
 
-    $response->assertSee('Passkeys');
-    $response->assertSee('No passkeys yet');
+    $response->assertSee('Jelszókulcsok');
+    $response->assertSee('Még nincs jelszókulcs');
 });
 
 test('security settings page requires password confirmation when enabled', function () {
@@ -43,9 +43,9 @@ test('security settings page renders without two factor when feature is disabled
         ->withSession(['auth.password_confirmed_at' => time()])
         ->get(route('security.edit'))
         ->assertOk()
-        ->assertSee('Update password')
-        ->assertDontSee('Manage your passkeys for passwordless sign-in')
-        ->assertDontSee('Add a passkey to sign in without a password')
+        ->assertSee('Jelszó frissítése')
+        ->assertDontSee('Kezeld a jelszó nélküli bejelentkezéshez használt jelszókulcsaidat')
+        ->assertDontSee('Adj hozzá egy jelszókulcsot a jelszó nélküli bejelentkezéshez')
         ->assertDontSee('Two-factor authentication');
 });
 

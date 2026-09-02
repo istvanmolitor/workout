@@ -7,7 +7,7 @@ use Flux\Flux;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('New exercise')]
+#[Title('Új gyakorlat')]
 class Create extends Component
 {
     public string $name = '';

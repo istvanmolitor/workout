@@ -9,7 +9,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Workout plans')]
+#[Title('Edzéstervek')]
 class Manage extends Component
 {
     /**

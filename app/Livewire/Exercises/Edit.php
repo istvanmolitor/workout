@@ -9,7 +9,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Edit exercise')]
+#[Title('Gyakorlat szerkesztése')]
 class Edit extends Component
 {
     #[Locked]

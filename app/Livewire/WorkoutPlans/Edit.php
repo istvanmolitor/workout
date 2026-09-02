@@ -11,7 +11,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Edit workout plan')]
+#[Title('Edzésterv szerkesztése')]
 class Edit extends Component
 {
     #[Locked]
