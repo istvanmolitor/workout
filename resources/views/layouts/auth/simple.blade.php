@@ -3,18 +3,21 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-white antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
-        <div class="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-            <div class="flex w-full max-w-sm flex-col gap-2">
-                <a href="{{ route('home') }}" class="flex flex-col items-center gap-2 font-medium" wire:navigate>
-                    <span class="flex h-9 w-9 mb-1 items-center justify-center rounded-md">
-                        <x-app-logo-icon class="size-9 fill-current text-black dark:text-white" />
-                    </span>
-                    <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
+    <body class="min-h-screen bg-white text-zinc-900 antialiased dark:bg-zinc-900 dark:text-zinc-100">
+        <div class="relative flex min-h-svh flex-col items-center justify-center overflow-hidden p-6 md:p-10">
+            <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+                <div class="absolute -top-40 left-1/2 h-[36rem] w-[36rem] -translate-x-1/3 rounded-full bg-orange-400/20 blur-3xl dark:bg-orange-500/10"></div>
+                <div class="absolute top-20 right-0 h-[28rem] w-[28rem] translate-x-1/3 rounded-full bg-blue-400/20 blur-3xl dark:bg-blue-500/10"></div>
+            </div>
+
+            <div class="flex w-full max-w-sm flex-col gap-6">
+                <a href="{{ route('home') }}" class="flex justify-center" wire:navigate>
+                    <x-app-logo />
                 </a>
-                <div class="flex flex-col gap-6">
+
+                <flux:card class="flex flex-col gap-6">
                     {{ $slot }}
-                </div>
+                </flux:card>
             </div>
         </div>
 
