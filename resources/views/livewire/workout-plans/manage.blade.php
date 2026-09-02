@@ -35,7 +35,7 @@
                 <ul class="space-y-1">
                     @foreach ($workoutPlan->exercises as $exercise)
                         <li class="flex items-center justify-between text-sm">
-                            <span>{{ $exercise->name }}</span>
+                            <span>{{ $exercise->exercise->name }}</span>
                             <flux:badge size="sm">{{ __(':sets x :reps', ['sets' => $exercise->sets, 'reps' => $exercise->reps]) }}</flux:badge>
                         </li>
                     @endforeach

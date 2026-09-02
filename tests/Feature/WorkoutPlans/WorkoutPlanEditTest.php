@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\WorkoutPlans\Edit;
+use App\Models\Exercise;
 use App\Models\User;
 use App\Models\WorkoutPlan;
 use App\Models\WorkoutPlanExercise;
@@ -34,14 +35,15 @@ test('a user cannot edit another user\'s workout plan', function () {
 test('owner can update the workout plan and its exercises', function () {
     $user = User::factory()->create();
     $workoutPlan = WorkoutPlan::factory()->for($user)->create(['name' => 'Push day']);
-    WorkoutPlanExercise::factory()->for($workoutPlan)->create(['name' => 'Old exercise']);
+    WorkoutPlanExercise::factory()->for($workoutPlan)->create(['exercise_id' => Exercise::factory()->create(['name' => 'Old exercise'])]);
+    $benchPress = Exercise::factory()->create(['name' => 'Bench press']);
 
     $this->actingAs($user);
 
     Livewire::test(Edit::class, ['workoutPlan' => $workoutPlan])
         ->set('name', 'Push day (updated)')
         ->set('exercises', [
-            ['name' => 'Bench press', 'sets' => 4, 'reps' => 8],
+            ['exercise_id' => $benchPress->id, 'sets' => 4, 'reps' => 8],
         ])
         ->call('save')
         ->assertHasNoErrors()
@@ -51,7 +53,7 @@ test('owner can update the workout plan and its exercises', function () {
 
     expect($workoutPlan->name)->toBe('Push day (updated)');
     expect($workoutPlan->exercises)->toHaveCount(1);
-    expect($workoutPlan->exercises->first()->name)->toBe('Bench press');
+    expect($workoutPlan->exercises->first()->exercise->name)->toBe('Bench press');
 });
 
 test('workout plan name is required', function () {

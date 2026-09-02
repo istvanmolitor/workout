@@ -2,8 +2,11 @@
 
 namespace App\Livewire\WorkoutPlans;
 
+use App\Models\Exercise;
 use Flux\Flux;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -15,18 +18,29 @@ class Create extends Component
     public string $description = '';
 
     /**
-     * @var array<int, array{name: string, sets: int|string, reps: int|string}>
+     * @var array<int, array{exercise_id: int|string, sets: int|string, reps: int|string}>
      */
     public array $exercises = [
-        ['name' => '', 'sets' => 3, 'reps' => 10],
+        ['exercise_id' => '', 'sets' => 3, 'reps' => 10],
     ];
+
+    /**
+     * Get the exercises available to choose from.
+     *
+     * @return Collection<int, Exercise>
+     */
+    #[Computed]
+    public function availableExercises(): Collection
+    {
+        return Exercise::query()->orderBy('name')->get();
+    }
 
     /**
      * Add an empty exercise row to the form.
      */
     public function addExercise(): void
     {
-        $this->exercises[] = ['name' => '', 'sets' => 3, 'reps' => 10];
+        $this->exercises[] = ['exercise_id' => '', 'sets' => 3, 'reps' => 10];
     }
 
     /**
@@ -48,7 +62,7 @@ class Create extends Component
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
             'exercises' => ['required', 'array', 'min:1'],
-            'exercises.*.name' => ['required', 'string', 'max:255'],
+            'exercises.*.exercise_id' => ['required', 'integer', 'exists:exercises,id'],
             'exercises.*.sets' => ['required', 'integer', 'min:1', 'max:99'],
             'exercises.*.reps' => ['required', 'integer', 'min:1', 'max:999'],
         ]);
@@ -60,7 +74,7 @@ class Create extends Component
 
         foreach ($validated['exercises'] as $order => $exercise) {
             $workoutPlan->exercises()->create([
-                'name' => $exercise['name'],
+                'exercise_id' => $exercise['exercise_id'],
                 'sets' => $exercise['sets'],
                 'reps' => $exercise['reps'],
                 'order' => $order,

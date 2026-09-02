@@ -13,7 +13,7 @@
 
         <flux:textarea wire:model="description" :label="__('Description')" rows="2" />
 
-        <x-workout-plans.exercise-fields :exercises="$exercises" />
+        <x-workout-plans.exercise-fields :exercises="$exercises" :available-exercises="$this->availableExercises" />
 
         <div class="flex items-center gap-4">
             <flux:button type="submit" variant="primary">

@@ -19,6 +19,10 @@
                     <flux:sidebar.item icon="clipboard-document-list" :href="route('workout-plans.index')" :current="request()->routeIs('workout-plans.*')" wire:navigate>
                         {{ __('Workout plans') }}
                     </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="list-bullet" :href="route('exercises.index')" :current="request()->routeIs('exercises.*')" wire:navigate>
+                        {{ __('Exercises') }}
+                    </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 
