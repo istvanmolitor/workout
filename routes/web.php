@@ -1,5 +1,8 @@
 <?php
 
+use App\Livewire\ExerciseCategories\Create as CreateExerciseCategory;
+use App\Livewire\ExerciseCategories\Edit as EditExerciseCategory;
+use App\Livewire\ExerciseCategories\Manage as ManageExerciseCategories;
 use App\Livewire\Exercises\Create as CreateExercise;
 use App\Livewire\Exercises\Edit as EditExercise;
 use App\Livewire\Exercises\Manage as ManageExercises;
@@ -20,6 +23,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('exercises', ManageExercises::class)->name('exercises.index');
     Route::livewire('exercises/create', CreateExercise::class)->name('exercises.create');
     Route::livewire('exercises/{exercise}/edit', EditExercise::class)->name('exercises.edit');
+
+    Route::livewire('exercise-categories', ManageExerciseCategories::class)->name('exercise-categories.index');
+    Route::livewire('exercise-categories/create', CreateExerciseCategory::class)->name('exercise-categories.create');
+    Route::livewire('exercise-categories/{exerciseCategory}/edit', EditExerciseCategory::class)->name('exercise-categories.edit');
 });
 
 require __DIR__.'/settings.php';

@@ -23,6 +23,10 @@
                     <flux:sidebar.item icon="list-bullet" :href="route('exercises.index')" :current="request()->routeIs('exercises.*')" wire:navigate>
                         {{ __('Exercises') }}
                     </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="tag" :href="route('exercise-categories.index')" :current="request()->routeIs('exercise-categories.*')" wire:navigate>
+                        {{ __('Exercise categories') }}
+                    </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

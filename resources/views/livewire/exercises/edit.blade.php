@@ -11,6 +11,12 @@
     <form wire:submit="save" class="mt-6 space-y-6">
         <flux:input wire:model="name" :label="__('Name')" required autofocus />
 
+        <flux:select wire:model="category_id" :label="__('Category')" :placeholder="__('Select category')">
+            @foreach ($this->categories as $category)
+                <flux:select.option value="{{ $category->id }}">{{ $category->name }}</flux:select.option>
+            @endforeach
+        </flux:select>
+
         <div class="flex items-center gap-4">
             <flux:button type="submit" variant="primary">
                 {{ __('Save changes') }}

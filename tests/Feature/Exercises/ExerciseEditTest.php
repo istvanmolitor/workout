@@ -2,6 +2,7 @@
 
 use App\Livewire\Exercises\Edit;
 use App\Models\Exercise;
+use App\Models\ExerciseCategory;
 use App\Models\User;
 use Livewire\Livewire;
 
@@ -65,4 +66,29 @@ test('exercise can keep its own name unchanged', function () {
         ->set('name', 'Bench press')
         ->call('save')
         ->assertHasNoErrors();
+});
+
+test('exercise category is required', function () {
+    $this->actingAs(User::factory()->create());
+
+    $exercise = Exercise::factory()->create();
+
+    Livewire::test(Edit::class, ['exercise' => $exercise])
+        ->set('category_id', null)
+        ->call('save')
+        ->assertHasErrors(['category_id' => 'required']);
+});
+
+test('exercise category can be updated', function () {
+    $this->actingAs(User::factory()->create());
+
+    $exercise = Exercise::factory()->create();
+    $category = ExerciseCategory::factory()->create();
+
+    Livewire::test(Edit::class, ['exercise' => $exercise])
+        ->set('category_id', $category->id)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect($exercise->refresh()->category_id)->toBe($category->id);
 });

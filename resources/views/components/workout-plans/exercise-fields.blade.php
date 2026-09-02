@@ -4,22 +4,25 @@
     <flux:label>{{ __('Exercises') }}</flux:label>
 
     @foreach ($exercises as $index => $exercise)
-        <div wire:key="exercise-row-{{ $index }}" class="flex items-start gap-2">
-            <flux:select wire:model="exercises.{{ $index }}.exercise_id" :placeholder="__('Select exercise')" class="flex-1">
+        <div wire:key="exercise-row-{{ $index }}" class="flex flex-col gap-2 sm:flex-row sm:items-start">
+            <flux:select wire:model="exercises.{{ $index }}.exercise_id" :placeholder="__('Select exercise')" class="min-w-0 sm:flex-1">
                 @foreach ($availableExercises as $availableExercise)
                     <flux:select.option value="{{ $availableExercise->id }}">{{ $availableExercise->name }}</flux:select.option>
                 @endforeach
             </flux:select>
-            <flux:input wire:model="exercises.{{ $index }}.sets" type="number" min="1" :placeholder="__('Sets')" class="w-20" />
-            <flux:input wire:model="exercises.{{ $index }}.reps" type="number" min="1" :placeholder="__('Reps')" class="w-20" />
 
-            <flux:button
-                type="button"
-                variant="ghost"
-                icon="trash"
-                wire:click="removeExercise({{ $index }})"
-                :disabled="count($exercises) <= 1"
-            />
+            <div class="flex items-start gap-2">
+                <flux:input wire:model="exercises.{{ $index }}.sets" type="number" min="1" :placeholder="__('Sets')" class="w-20" />
+                <flux:input wire:model="exercises.{{ $index }}.reps" type="number" min="1" :placeholder="__('Reps')" class="w-20" />
+
+                <flux:button
+                    type="button"
+                    variant="ghost"
+                    icon="trash"
+                    wire:click="removeExercise({{ $index }})"
+                    :disabled="count($exercises) <= 1"
+                />
+            </div>
         </div>
         <flux:error name="exercises.{{ $index }}.exercise_id" />
         <flux:error name="exercises.{{ $index }}.sets" />

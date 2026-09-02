@@ -21,7 +21,7 @@ class Manage extends Component
     #[Computed]
     public function exercises(): Collection
     {
-        return Exercise::query()->orderBy('name')->get();
+        return Exercise::query()->with('category')->orderBy('name')->get();
     }
 
     /**

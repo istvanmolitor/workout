@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Exercise;
+use App\Models\ExerciseCategory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -16,16 +17,20 @@ class ExerciseSeeder extends Seeder
     public function run(): void
     {
         collect([
-            'Fekvenyomás',
-            'Guggolás',
-            'Felhúzás',
-            'Csigás lehúzás',
-            'Húzódzkodás',
-            'Vállból nyomás',
-            'Lábtolás',
-            'Bicepsz hajlítás',
-            'Tricepsz nyomás',
-            'Hasizom prés',
-        ])->each(fn (string $name) => Exercise::query()->firstOrCreate(['name' => $name]));
+            'Fekvenyomás' => 'Mell',
+            'Guggolás' => 'Láb',
+            'Felhúzás' => 'Hát',
+            'Csigás lehúzás' => 'Hát',
+            'Húzódzkodás' => 'Hát',
+            'Vállból nyomás' => 'Váll',
+            'Lábtolás' => 'Láb',
+            'Bicepsz hajlítás' => 'Bicepsz',
+            'Tricepsz nyomás' => 'Tricepsz',
+            'Hasizom prés' => 'Has',
+        ])->each(function (?string $categoryName, string $name) {
+            $category = $categoryName ? ExerciseCategory::query()->where('name', $categoryName)->first() : null;
+
+            Exercise::query()->updateOrCreate(['name' => $name], ['category_id' => $category?->id]);
+        });
     }
 }

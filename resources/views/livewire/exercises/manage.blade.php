@@ -13,7 +13,13 @@
     <div class="mt-6 space-y-2">
         @forelse ($this->exercises as $exercise)
             <flux:card wire:key="exercise-{{ $exercise->id }}" class="flex items-center justify-between gap-2 py-3">
-                <flux:text>{{ $exercise->name }}</flux:text>
+                <div class="flex items-center gap-2">
+                    <flux:text>{{ $exercise->name }}</flux:text>
+
+                    @if ($exercise->category)
+                        <flux:badge size="sm">{{ $exercise->category->name }}</flux:badge>
+                    @endif
+                </div>
 
                 <div class="flex items-center gap-1">
                     <flux:button
