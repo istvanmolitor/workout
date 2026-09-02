@@ -49,7 +49,7 @@ test('owner can log completed reps, weight and difficulty per set', function () 
         ->set("exercises.{$exercise->id}.sets.{$firstSet->id}.completed_weight", 62.5)
         ->set("exercises.{$exercise->id}.sets.{$secondSet->id}.completed_reps", 6)
         ->set("exercises.{$exercise->id}.sets.{$secondSet->id}.completed_weight", 72.5)
-        ->set("exercises.{$exercise->id}.difficulty", 7)
+        ->set("exercises.{$exercise->id}.difficulty", 4)
         ->call('save')
         ->assertHasNoErrors()
         ->assertRedirect(route('workouts.index'));
@@ -60,10 +60,10 @@ test('owner can log completed reps, weight and difficulty per set', function () 
     expect((float) $firstSet->completed_weight)->toBe(62.5);
     expect($secondSet->refresh()->completed_reps)->toBe(6);
     expect((float) $secondSet->completed_weight)->toBe(72.5);
-    expect($exercise->difficulty)->toBe(7);
+    expect($exercise->difficulty)->toBe(4);
 });
 
-test('difficulty must be between 1 and 10', function () {
+test('difficulty must be between 1 and 5', function () {
     $user = User::factory()->create();
     $workout = Workout::factory()->for($user)->create();
     $exercise = WorkoutExercise::factory()->for($workout)->create();
@@ -72,7 +72,7 @@ test('difficulty must be between 1 and 10', function () {
     $this->actingAs($user);
 
     Livewire::test(Edit::class, ['workout' => $workout])
-        ->set("exercises.{$exercise->id}.difficulty", 11)
+        ->set("exercises.{$exercise->id}.difficulty", 6)
         ->call('save')
         ->assertHasErrors(["exercises.{$exercise->id}.difficulty" => 'max']);
 });

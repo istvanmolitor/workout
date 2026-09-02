@@ -55,13 +55,11 @@
                 @endforeach
             </div>
 
-            <flux:input
-                wire:model="exercises.{{ $activeExerciseId }}.difficulty"
-                type="number"
-                min="1"
-                max="10"
-                :label="__('Difficulty (1-10)')"
-            />
+            <flux:radio.group wire:model="exercises.{{ $activeExerciseId }}.difficulty" :label="__('Difficulty')">
+                @foreach ($this->difficultyLabels as $level => $difficultyLabel)
+                    <flux:radio value="{{ $level }}" :label="$difficultyLabel" />
+                @endforeach
+            </flux:radio.group>
             <flux:error name="exercises.{{ $activeExerciseId }}.difficulty" />
 
             <flux:button type="submit" variant="primary" class="h-14 w-full text-lg">

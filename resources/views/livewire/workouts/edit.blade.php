@@ -41,9 +41,13 @@
                         </div>
                     @endforeach
 
-                    <flux:input wire:model="exercises.{{ $exercise->id }}.difficulty" type="number" min="1" max="10" :label="__('Difficulty (1-10)')" class="w-32" />
                 </div>
 
+                <flux:radio.group wire:model="exercises.{{ $exercise->id }}.difficulty" :label="__('Difficulty')">
+                    @foreach ($this->difficultyLabels as $level => $difficultyLabel)
+                        <flux:radio value="{{ $level }}" :label="$difficultyLabel" />
+                    @endforeach
+                </flux:radio.group>
                 <flux:error name="exercises.{{ $exercise->id }}.difficulty" />
 
                 <flux:separator />

@@ -54,4 +54,20 @@ class WorkoutExercise extends Model
     {
         return $this->hasMany(WorkoutExerciseSet::class)->orderBy('order');
     }
+
+    /**
+     * Get the translated labels for each difficulty level, keyed by level.
+     *
+     * @return array<int, string>
+     */
+    public static function difficultyLabels(): array
+    {
+        return [
+            1 => __('Very easy'),
+            2 => __('Easy'),
+            3 => __('Medium'),
+            4 => __('Hard'),
+            5 => __('Very hard'),
+        ];
+    }
 }

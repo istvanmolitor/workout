@@ -91,7 +91,7 @@ test('owner can log completed reps, weight and difficulty for the active exercis
         ->set("exercises.{$exercise->id}.sets.{$firstSet->id}.completed_weight", 42.5)
         ->set("exercises.{$exercise->id}.sets.{$secondSet->id}.completed_reps", 5)
         ->set("exercises.{$exercise->id}.sets.{$secondSet->id}.completed_weight", 47.5)
-        ->set("exercises.{$exercise->id}.difficulty", 8)
+        ->set("exercises.{$exercise->id}.difficulty", 4)
         ->call('save')
         ->assertHasNoErrors()
         ->assertSet('activeExerciseId', null)
@@ -103,10 +103,10 @@ test('owner can log completed reps, weight and difficulty for the active exercis
     expect((float) $firstSet->completed_weight)->toBe(42.5);
     expect($secondSet->refresh()->completed_reps)->toBe(5);
     expect((float) $secondSet->completed_weight)->toBe(47.5);
-    expect($exercise->difficulty)->toBe(8);
+    expect($exercise->difficulty)->toBe(4);
 });
 
-test('difficulty must be between 1 and 10', function () {
+test('difficulty must be between 1 and 5', function () {
     $user = User::factory()->create();
     $workout = Workout::factory()->for($user)->create();
     $exercise = WorkoutExercise::factory()->for($workout)->create([
@@ -118,7 +118,7 @@ test('difficulty must be between 1 and 10', function () {
 
     Livewire::test(Perform::class, ['workout' => $workout])
         ->call('selectExercise', $exercise->id)
-        ->set("exercises.{$exercise->id}.difficulty", 11)
+        ->set("exercises.{$exercise->id}.difficulty", 6)
         ->call('save')
         ->assertHasErrors(["exercises.{$exercise->id}.difficulty" => 'max']);
 });

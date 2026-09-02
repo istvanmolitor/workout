@@ -6,6 +6,7 @@ use App\Models\Workout;
 use App\Models\WorkoutExercise;
 use App\Models\WorkoutExerciseSet;
 use Flux\Flux;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
@@ -69,6 +70,17 @@ class Perform extends Component
     }
 
     /**
+     * Get the translated labels for each difficulty level, keyed by level.
+     *
+     * @return array<int, string>
+     */
+    #[Computed]
+    public function difficultyLabels(): array
+    {
+        return WorkoutExercise::difficultyLabels();
+    }
+
+    /**
      * Focus a single exercise to log its results.
      */
     public function selectExercise(int $workoutExerciseId): void
@@ -96,7 +108,7 @@ class Perform extends Component
         $validated = $this->validate([
             "exercises.{$workoutExerciseId}.sets.*.completed_reps" => ['nullable', 'integer', 'min:0', 'max:999'],
             "exercises.{$workoutExerciseId}.sets.*.completed_weight" => ['nullable', 'numeric', 'min:0', 'max:9999.99'],
-            "exercises.{$workoutExerciseId}.difficulty" => ['nullable', 'integer', 'min:1', 'max:10'],
+            "exercises.{$workoutExerciseId}.difficulty" => ['nullable', 'integer', 'min:1', 'max:5'],
         ]);
 
         foreach ($validated['exercises'][$workoutExerciseId]['sets'] as $setId => $set) {
