@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Dashboard;
 use App\Livewire\ExerciseCategories\Create as CreateExerciseCategory;
 use App\Livewire\ExerciseCategories\Edit as EditExerciseCategory;
 use App\Livewire\ExerciseCategories\Manage as ManageExerciseCategories;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::livewire('dashboard', Dashboard::class)->name('dashboard');
 
     Route::livewire('workout-plans', ManageWorkoutPlans::class)->name('workout-plans.index');
     Route::livewire('workout-plans/create', CreateWorkoutPlan::class)->name('workout-plans.create');
