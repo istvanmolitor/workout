@@ -1,4 +1,4 @@
-<section class="w-full max-w-2xl">
+<section class="w-full max-w-5xl">
     <div class="flex items-center justify-between">
         <div>
             <flux:heading size="xl">{{ __('Exercises') }}</flux:heading>
@@ -10,36 +10,42 @@
         </flux:button>
     </div>
 
-    <div class="mt-6 space-y-2">
+    <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         @forelse ($this->exercises as $exercise)
-            <flux:card wire:key="exercise-{{ $exercise->id }}" class="flex items-center justify-between gap-2 py-3">
-                <div class="flex items-center gap-2">
-                    <flux:text>{{ $exercise->name }}</flux:text>
+            <flux:card wire:key="exercise-{{ $exercise->id }}" class="flex flex-col gap-3">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-800">
+                        <flux:icon :icon="$exercise->category?->icon() ?? 'dumbbell'" class="size-5 text-zinc-500 dark:text-zinc-400" />
+                    </div>
 
-                    @if ($exercise->category)
-                        <flux:badge size="sm">{{ $exercise->category->name }}</flux:badge>
-                    @endif
+                    <div class="flex items-center gap-1">
+                        <flux:button
+                            variant="ghost"
+                            size="sm"
+                            icon="pencil"
+                            :href="route('exercises.edit', $exercise)"
+                            wire:navigate
+                        />
+                        <flux:button
+                            variant="ghost"
+                            size="sm"
+                            icon="trash"
+                            wire:click="delete({{ $exercise->id }})"
+                            wire:confirm="{{ __('Delete this exercise?') }}"
+                        />
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-1">
-                    <flux:button
-                        variant="ghost"
-                        size="sm"
-                        icon="pencil"
-                        :href="route('exercises.edit', $exercise)"
-                        wire:navigate
-                    />
-                    <flux:button
-                        variant="ghost"
-                        size="sm"
-                        icon="trash"
-                        wire:click="delete({{ $exercise->id }})"
-                        wire:confirm="{{ __('Delete this exercise?') }}"
-                    />
+                <div>
+                    <flux:text class="font-medium">{{ $exercise->name }}</flux:text>
+
+                    @if ($exercise->category)
+                        <flux:badge size="sm" class="mt-2">{{ $exercise->category->name }}</flux:badge>
+                    @endif
                 </div>
             </flux:card>
         @empty
-            <div class="p-8 text-center border rounded-lg border-zinc-200 dark:border-zinc-700">
+            <div class="p-8 text-center border rounded-lg border-zinc-200 dark:border-zinc-700 sm:col-span-2 lg:col-span-3">
                 <p class="font-medium">{{ __('No exercises yet') }}</p>
                 <flux:text class="mt-1">{{ __('Add your first exercise to build your catalog') }}</flux:text>
             </div>

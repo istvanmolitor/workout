@@ -30,4 +30,23 @@ class ExerciseCategory extends Model
     {
         return $this->hasMany(Exercise::class, 'category_id');
     }
+
+    /**
+     * Get the Flux icon name representing this category.
+     */
+    public function icon(): string
+    {
+        return match ($this->name) {
+            'Hát' => 'move-vertical',
+            'Bicepsz' => 'biceps-flexed',
+            'Tricepsz' => 'dumbbell',
+            'Has' => 'activity',
+            'Váll' => 'person-standing',
+            'Mell' => 'shirt',
+            'Láb' => 'footprints',
+            'Kardió' => 'heart-pulse',
+            'Nyújtás' => 'stretch-horizontal',
+            default => 'dumbbell',
+        };
+    }
 }
