@@ -39,6 +39,10 @@
                             :href="route('workout-plans.edit', $workoutPlan)"
                             wire:navigate
                         />
+
+                        <flux:modal.trigger name="confirm-workout-plan-deletion-{{ $workoutPlan->id }}">
+                            <flux:button variant="ghost" size="sm" icon="trash" />
+                        </flux:modal.trigger>
                     </div>
                 </div>
 
@@ -62,4 +66,30 @@
             </div>
         @endforelse
     </div>
+
+    @foreach ($this->workoutPlans as $workoutPlan)
+        <flux:modal name="confirm-workout-plan-deletion-{{ $workoutPlan->id }}" focusable class="max-w-lg">
+            <div class="space-y-6">
+                <div>
+                    <flux:heading size="lg">{{ __('Delete workout plan?') }}</flux:heading>
+
+                    <flux:subheading>
+                        {{ __('Are you sure you want to delete this workout plan? This action cannot be undone.') }}
+                    </flux:subheading>
+                </div>
+
+                <div class="flex justify-end space-x-2 rtl:space-x-reverse">
+                    <flux:modal.close>
+                        <flux:button variant="filled">{{ __('Cancel') }}</flux:button>
+                    </flux:modal.close>
+
+                    <flux:modal.close>
+                        <flux:button variant="danger" wire:click="deleteWorkoutPlan({{ $workoutPlan->id }})">
+                            {{ __('Delete') }}
+                        </flux:button>
+                    </flux:modal.close>
+                </div>
+            </div>
+        </flux:modal>
+    @endforeach
 </section>

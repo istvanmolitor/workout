@@ -1,70 +1,54 @@
 <section class="w-full">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-        <div>
-            <flux:heading size="xl">{{ __('Dashboard') }}</flux:heading>
-            <flux:subheading>{{ $this->monthLabel }}</flux:subheading>
-        </div>
-
-        <div class="flex items-center gap-1">
-            <flux:button variant="ghost" size="sm" icon="chevron-left" wire:click="previousMonth" />
-            <flux:button variant="ghost" size="sm" wire:click="goToToday">{{ __('Today') }}</flux:button>
-            <flux:button variant="ghost" size="sm" icon="chevron-right" wire:click="nextMonth" />
-        </div>
+    <div>
+        <flux:heading size="xl">{{ __('Dashboard') }}</flux:heading>
     </div>
 
-    <div class="mt-6 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-        <div class="grid grid-cols-7 border-b border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900">
-            @foreach (['H', 'K', 'Sze', 'Cs', 'P', 'Szo', 'V'] as $weekday)
-                <div class="p-2 text-center text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                    {{ $weekday }}
-                </div>
-            @endforeach
-        </div>
+    <div class="mt-6">
+        <flux:heading size="lg">{{ __('Last workout') }}</flux:heading>
 
-        <div class="grid grid-cols-7">
-            @foreach ($this->weeks as $week)
-                @foreach ($week as $day)
-                    @php
-                        $dayWorkouts = $this->workoutsByDate->get($day->format('Y-m-d'), collect());
-                        $isCurrentMonth = $day->month === $month;
-                    @endphp
-
-                    <div
-                        wire:key="day-{{ $day->format('Y-m-d') }}"
-                        @class([
-                            'min-h-24 border-b border-r border-neutral-200 p-2 last:border-r-0 dark:border-neutral-700',
-                            'bg-white dark:bg-neutral-800' => $isCurrentMonth,
-                            'bg-neutral-50 dark:bg-neutral-900' => ! $isCurrentMonth,
-                        ])
-                    >
-                        <span
-                            @class([
-                                'text-sm',
-                                'text-neutral-400 dark:text-neutral-600' => ! $isCurrentMonth,
-                                'font-semibold text-white flex size-6 items-center justify-center rounded-full bg-red-500' => $day->isToday(),
-                            ])
-                        >
-                            {{ $day->day }}
-                        </span>
-
-                        <div class="mt-1 space-y-1">
-                            @foreach ($dayWorkouts as $workout)
-                                <flux:button
-                                    wire:key="workout-{{ $workout->id }}"
-                                    variant="ghost"
-                                    size="sm"
-                                    :href="route('workouts.edit', $workout)"
-                                    wire:navigate
-                                    class="!h-auto w-full !justify-start truncate !px-2 !py-1 text-xs"
-                                >
-                                    {{ $workout->name }}
-                                </flux:button>
-                            @endforeach
-                        </div>
+        @if ($this->lastWorkout)
+            <flux:card class="mt-4 space-y-3">
+                <div class="flex items-start justify-between gap-2">
+                    <div>
+                        <flux:heading>{{ $this->lastWorkout->name }}</flux:heading>
+                        <flux:text class="mt-1">{{ $this->lastWorkout->performed_at->translatedFormat('Y. m. d.') }}</flux:text>
                     </div>
-                @endforeach
-            @endforeach
-        </div>
+
+                    <flux:button variant="primary" size="sm" icon="plus" :href="route('workout-plans.index')" wire:navigate>
+                        {{ __('New workout') }}
+                    </flux:button>
+                </div>
+
+                <flux:separator />
+
+                <ul class="space-y-1">
+                    @foreach ($this->lastWorkout->exercises as $exercise)
+                        <li class="flex items-center justify-between text-sm">
+                            <span>{{ $exercise->exercise->name }}</span>
+                            @if ($exercise->sets->contains(fn ($set) => $set->completed_reps !== null))
+                                <flux:badge size="sm">
+                                    {{ $exercise->sets->map(fn ($set) => ($set->completed_reps ?? '?').($set->completed_weight !== null ? '×'.rtrim(rtrim($set->completed_weight, '0'), '.').'kg' : ''))->join(', ') }}
+                                    @if ($exercise->difficulty !== null)
+                                        &middot; {{ $exercise->difficulty }}/5
+                                    @endif
+                                </flux:badge>
+                            @else
+                                <flux:badge size="sm">{{ __('Not logged yet') }}</flux:badge>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            </flux:card>
+        @else
+            <div class="mt-4 p-8 text-center border rounded-lg border-zinc-200 dark:border-zinc-700">
+                <p class="font-medium">{{ __('No workouts yet') }}</p>
+                <flux:text class="mt-1">{{ __('Start a workout from one of your workout plans to get going') }}</flux:text>
+
+                <flux:button variant="primary" size="sm" icon="plus" class="mt-4" :href="route('workout-plans.index')" wire:navigate>
+                    {{ __('New workout') }}
+                </flux:button>
+            </div>
+        @endif
     </div>
 
     <div class="mt-6">

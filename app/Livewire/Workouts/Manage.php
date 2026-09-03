@@ -3,6 +3,7 @@
 namespace App\Livewire\Workouts;
 
 use App\Models\Workout;
+use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -21,5 +22,19 @@ class Manage extends Component
     public function workouts(): Collection
     {
         return Auth::user()->workouts()->with('exercises.exercise', 'exercises.sets')->latest('performed_at')->latest()->get();
+    }
+
+    /**
+     * Delete the given workout.
+     */
+    public function deleteWorkout(Workout $workout): void
+    {
+        $this->authorize('delete', $workout);
+
+        $workout->delete();
+
+        unset($this->workouts);
+
+        Flux::toast(variant: 'success', text: __('Workout deleted.'));
     }
 }

@@ -33,3 +33,18 @@ test('non-owner cannot view the workout plan', function () {
 
     expect((new WorkoutPlanPolicy)->view($user, $workoutPlan))->toBeFalse();
 });
+
+test('owner can delete their workout plan', function () {
+    $user = User::factory()->create();
+    $workoutPlan = WorkoutPlan::factory()->for($user)->create();
+
+    expect((new WorkoutPlanPolicy)->delete($user, $workoutPlan))->toBeTrue();
+});
+
+test('non-owner cannot delete the workout plan', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $workoutPlan = WorkoutPlan::factory()->for($otherUser)->create();
+
+    expect((new WorkoutPlanPolicy)->delete($user, $workoutPlan))->toBeFalse();
+});

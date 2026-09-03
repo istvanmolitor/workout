@@ -4,7 +4,6 @@ use App\Livewire\Dashboard;
 use App\Models\BodyWeight;
 use App\Models\User;
 use App\Models\Workout;
-use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 
 test('guests are redirected to the login page', function () {
@@ -20,80 +19,45 @@ test('authenticated users can visit the dashboard', function () {
     $response->assertOk();
 });
 
-test('dashboard calendar shows the current month\'s workouts', function () {
+test('dashboard shows the user\'s most recently logged workout', function () {
     $user = User::factory()->create();
-    $workout = Workout::factory()->for($user)->create([
-        'name' => 'Push day',
-        'performed_at' => now()->startOfMonth()->addDays(2),
+    Workout::factory()->for($user)->create([
+        'name' => 'Older workout',
+        'performed_at' => now()->subDays(5),
+    ]);
+    Workout::factory()->for($user)->create([
+        'name' => 'Latest workout',
+        'performed_at' => now()->subDay(),
     ]);
 
     $this->actingAs($user);
 
-    Livewire::test(Dashboard::class)->assertSee('Push day');
-
-    expect($workout->performed_at->isSameMonth(now()))->toBeTrue();
+    Livewire::test(Dashboard::class)
+        ->assertSee('Latest workout')
+        ->assertDontSee('Older workout')
+        ->assertSeeHtml(route('workout-plans.index'));
 });
 
-test('dashboard calendar only shows the user\'s own workouts', function () {
+test('dashboard only shows the user\'s own last workout', function () {
     $user = User::factory()->create();
     $otherUser = User::factory()->create();
 
-    Workout::factory()->for($otherUser)->create([
-        'name' => 'Someone else\'s workout',
-        'performed_at' => now()->startOfMonth()->addDays(2),
-    ]);
-    Workout::factory()->for($user)->create([
-        'name' => 'My workout',
-        'performed_at' => now()->startOfMonth()->addDays(2),
-    ]);
+    Workout::factory()->for($otherUser)->create(['name' => 'Someone else\'s workout']);
 
     $this->actingAs($user);
 
     Livewire::test(Dashboard::class)
-        ->assertSee('My workout')
+        ->assertSee(__('No workouts yet'))
         ->assertDontSee('Someone else\'s workout');
 });
 
-test('dashboard calendar does not show workouts from other months', function () {
-    $user = User::factory()->create();
-    Workout::factory()->for($user)->create([
-        'name' => 'Last month\'s workout',
-        'performed_at' => now()->subMonthNoOverflow(),
-    ]);
-
-    $this->actingAs($user);
-
-    Livewire::test(Dashboard::class)->assertDontSee('Last month\'s workout');
-});
-
-test('user can navigate to the previous and next month', function () {
-    $user = User::factory()->create();
-    $lastMonthWorkout = Workout::factory()->for($user)->create([
-        'name' => 'Last month\'s workout',
-        'performed_at' => now()->subMonthNoOverflow()->startOfMonth()->addDays(2),
-    ]);
-
-    $this->actingAs($user);
-
-    Livewire::test(Dashboard::class)
-        ->assertDontSee('Last month\'s workout')
-        ->call('previousMonth')
-        ->assertSee('Last month\'s workout')
-        ->call('nextMonth')
-        ->assertDontSee('Last month\'s workout');
-
-    expect($lastMonthWorkout->performed_at->isSameMonth(now()->subMonthNoOverflow()))->toBeTrue();
-});
-
-test('user can jump back to the current month', function () {
+test('dashboard prompts to start a workout when none are logged yet', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
     Livewire::test(Dashboard::class)
-        ->call('previousMonth')
-        ->call('goToToday')
-        ->assertSet('year', Carbon::now()->year)
-        ->assertSet('month', Carbon::now()->month);
+        ->assertSee(__('No workouts yet'))
+        ->assertSeeHtml(route('workout-plans.index'));
 });
 
 test('dashboard shows a weight chart when the user has multiple body weight entries', function () {

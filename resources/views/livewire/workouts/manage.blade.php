@@ -1,7 +1,13 @@
 <section class="w-full">
-    <div>
-        <flux:heading size="xl">{{ __('Workouts') }}</flux:heading>
-        <flux:subheading>{{ __('Review your logged workouts') }}</flux:subheading>
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <flux:heading size="xl">{{ __('Workouts') }}</flux:heading>
+            <flux:subheading>{{ __('Review your logged workouts') }}</flux:subheading>
+        </div>
+
+        <flux:button variant="ghost" icon="calendar-days" :href="route('workouts.calendar')" wire:navigate>
+            {{ __('Calendar') }}
+        </flux:button>
     </div>
 
     <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -29,6 +35,10 @@
                             :href="route('workouts.edit', $workout)"
                             wire:navigate
                         />
+
+                        <flux:modal.trigger name="confirm-workout-deletion-{{ $workout->id }}">
+                            <flux:button variant="ghost" size="sm" icon="trash" />
+                        </flux:modal.trigger>
                     </div>
                 </div>
 
@@ -59,4 +69,30 @@
             </div>
         @endforelse
     </div>
+
+    @foreach ($this->workouts as $workout)
+        <flux:modal name="confirm-workout-deletion-{{ $workout->id }}" focusable class="max-w-lg">
+            <div class="space-y-6">
+                <div>
+                    <flux:heading size="lg">{{ __('Delete workout?') }}</flux:heading>
+
+                    <flux:subheading>
+                        {{ __('Are you sure you want to delete this workout? This action cannot be undone.') }}
+                    </flux:subheading>
+                </div>
+
+                <div class="flex justify-end space-x-2 rtl:space-x-reverse">
+                    <flux:modal.close>
+                        <flux:button variant="filled">{{ __('Cancel') }}</flux:button>
+                    </flux:modal.close>
+
+                    <flux:modal.close>
+                        <flux:button variant="danger" wire:click="deleteWorkout({{ $workout->id }})">
+                            {{ __('Delete') }}
+                        </flux:button>
+                    </flux:modal.close>
+                </div>
+            </div>
+        </flux:modal>
+    @endforeach
 </section>

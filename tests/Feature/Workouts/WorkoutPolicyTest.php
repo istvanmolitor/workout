@@ -18,3 +18,18 @@ test('non-owner cannot update the workout', function () {
 
     expect((new WorkoutPolicy)->update($user, $workout))->toBeFalse();
 });
+
+test('owner can delete their workout', function () {
+    $user = User::factory()->create();
+    $workout = Workout::factory()->for($user)->create();
+
+    expect((new WorkoutPolicy)->delete($user, $workout))->toBeTrue();
+});
+
+test('non-owner cannot delete the workout', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $workout = Workout::factory()->for($otherUser)->create();
+
+    expect((new WorkoutPolicy)->delete($user, $workout))->toBeFalse();
+});

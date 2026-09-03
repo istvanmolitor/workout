@@ -22,4 +22,12 @@ class WorkoutPlanPolicy
     {
         return $user->id === $workoutPlan->user_id;
     }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, WorkoutPlan $workoutPlan): bool
+    {
+        return $user->id === $workoutPlan->user_id;
+    }
 }

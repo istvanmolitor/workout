@@ -3,6 +3,7 @@
 namespace App\Livewire\WorkoutPlans;
 
 use App\Models\WorkoutPlan;
+use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -52,5 +53,19 @@ class Manage extends Component
         }
 
         $this->redirectRoute('workouts.perform', $workout, navigate: true);
+    }
+
+    /**
+     * Delete the given workout plan.
+     */
+    public function deleteWorkoutPlan(WorkoutPlan $workoutPlan): void
+    {
+        $this->authorize('delete', $workoutPlan);
+
+        $workoutPlan->delete();
+
+        unset($this->workoutPlans);
+
+        Flux::toast(variant: 'success', text: __('Workout plan deleted.'));
     }
 }

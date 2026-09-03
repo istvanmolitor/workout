@@ -77,3 +77,43 @@ test('a user cannot start a workout from another user\'s workout plan', function
 
     expect(Workout::query()->count())->toBe(0);
 });
+
+test('owner can delete their workout plan', function () {
+    $user = User::factory()->create();
+    $workoutPlan = WorkoutPlan::factory()->for($user)->create(['name' => 'Push day']);
+
+    $this->actingAs($user);
+
+    Livewire::test(Manage::class)
+        ->call('deleteWorkoutPlan', $workoutPlan->id)
+        ->assertDontSee('Push day');
+
+    expect(WorkoutPlan::query()->find($workoutPlan->id))->toBeNull();
+});
+
+test('deleting a workout plan removes its exercises and sets', function () {
+    $user = User::factory()->create();
+    $workoutPlan = WorkoutPlan::factory()->for($user)->create();
+    $planExercise = WorkoutPlanExercise::factory()->for($workoutPlan)->create();
+    WorkoutPlanExerciseSet::factory()->for($planExercise, 'workoutPlanExercise')->create();
+
+    $this->actingAs($user);
+
+    Livewire::test(Manage::class)->call('deleteWorkoutPlan', $workoutPlan->id);
+
+    expect(WorkoutPlanExercise::query()->where('workout_plan_id', $workoutPlan->id)->count())->toBe(0);
+});
+
+test('a user cannot delete another user\'s workout plan', function () {
+    $owner = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $workoutPlan = WorkoutPlan::factory()->for($owner)->create();
+
+    $this->actingAs($otherUser);
+
+    Livewire::test(Manage::class)
+        ->call('deleteWorkoutPlan', $workoutPlan->id)
+        ->assertForbidden();
+
+    expect(WorkoutPlan::query()->find($workoutPlan->id))->not->toBeNull();
+});
