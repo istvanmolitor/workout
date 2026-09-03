@@ -1,5 +1,8 @@
 <?php
 
+use App\Livewire\BodyWeights\Create as CreateBodyWeight;
+use App\Livewire\BodyWeights\Edit as EditBodyWeight;
+use App\Livewire\BodyWeights\Manage as ManageBodyWeights;
 use App\Livewire\Dashboard;
 use App\Livewire\ExerciseCategories\Create as CreateExerciseCategory;
 use App\Livewire\ExerciseCategories\Edit as EditExerciseCategory;
@@ -19,6 +22,10 @@ Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('dashboard', Dashboard::class)->name('dashboard');
+
+    Route::livewire('body-weights', ManageBodyWeights::class)->name('body-weights.index');
+    Route::livewire('body-weights/create', CreateBodyWeight::class)->name('body-weights.create');
+    Route::livewire('body-weights/{bodyWeight}/edit', EditBodyWeight::class)->name('body-weights.edit');
 
     Route::livewire('workout-plans', ManageWorkoutPlans::class)->name('workout-plans.index');
     Route::livewire('workout-plans/create', CreateWorkoutPlan::class)->name('workout-plans.create');

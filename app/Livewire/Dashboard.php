@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\BodyWeight;
 use App\Models\Workout;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
@@ -103,5 +104,49 @@ class Dashboard extends Component
             ->whereBetween('performed_at', [$start, $end])
             ->get()
             ->groupBy(fn (Workout $workout) => $workout->performed_at->format('Y-m-d'));
+    }
+
+    /**
+     * Get the authenticated user's most recent body weight entries, oldest first.
+     *
+     * @return EloquentCollection<int, BodyWeight>
+     */
+    #[Computed]
+    public function bodyWeights(): EloquentCollection
+    {
+        return Auth::user()->bodyWeights()
+            ->latest('measured_at')
+            ->limit(30)
+            ->get()
+            ->sortBy('measured_at')
+            ->values();
+    }
+
+    /**
+     * Get the SVG polyline points for the body weight chart, scaled to a 0-100 x 0-40 viewBox.
+     *
+     * @return array<int, array{x: float, y: float}>
+     */
+    #[Computed]
+    public function bodyWeightChartPoints(): array
+    {
+        $bodyWeights = $this->bodyWeights;
+        $count = $bodyWeights->count();
+
+        if ($count < 2) {
+            return [];
+        }
+
+        $values = $bodyWeights->map(fn (BodyWeight $entry) => (float) $entry->weight);
+        $min = $values->min();
+        $range = max($values->max() - $min, 0.01);
+
+        return $bodyWeights
+            ->map(fn (BodyWeight $entry, int $index) => [
+                'x' => ($index / ($count - 1)) * 100,
+                'y' => 40 - ((((float) $entry->weight) - $min) / $range) * 40,
+            ])
+            ->values()
+            ->all();
     }
 }

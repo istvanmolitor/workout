@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Dashboard;
+use App\Models\BodyWeight;
 use App\Models\User;
 use App\Models\Workout;
 use Illuminate\Support\Carbon;
@@ -93,4 +94,36 @@ test('user can jump back to the current month', function () {
         ->call('goToToday')
         ->assertSet('year', Carbon::now()->year)
         ->assertSet('month', Carbon::now()->month);
+});
+
+test('dashboard shows a weight chart when the user has multiple body weight entries', function () {
+    $user = User::factory()->create();
+    BodyWeight::factory()->for($user)->create(['weight' => 80, 'measured_at' => now()->subDays(2)]);
+    BodyWeight::factory()->for($user)->create(['weight' => 79, 'measured_at' => now()->subDay()]);
+
+    $this->actingAs($user);
+
+    Livewire::test(Dashboard::class)
+        ->assertSee('79.00 kg')
+        ->assertSeeHtml('<polyline');
+
+    expect(Livewire::test(Dashboard::class)->get('bodyWeightChartPoints'))->toHaveCount(2);
+});
+
+test('dashboard weight chart only reflects the user\'s own body weight entries', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+
+    BodyWeight::factory()->for($otherUser)->create(['weight' => 91.5]);
+
+    $this->actingAs($user);
+
+    Livewire::test(Dashboard::class)->assertDontSee('91.50');
+});
+
+test('dashboard prompts for a first body weight entry when none are logged', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    Livewire::test(Dashboard::class)->assertSee(__('No body weight entries yet'));
 });

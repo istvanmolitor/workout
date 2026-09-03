@@ -79,4 +79,14 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->hasMany(Workout::class);
     }
+
+    /**
+     * Get the body weight entries logged by the user.
+     *
+     * @return HasMany<BodyWeight, $this>
+     */
+    public function bodyWeights(): HasMany
+    {
+        return $this->hasMany(BodyWeight::class);
+    }
 }

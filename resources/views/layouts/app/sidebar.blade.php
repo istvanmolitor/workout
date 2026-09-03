@@ -16,6 +16,10 @@
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
 
+                    <flux:sidebar.item icon="scale" :href="route('body-weights.index')" :current="request()->routeIs('body-weights.*')" wire:navigate>
+                        {{ __('Body weight') }}
+                    </flux:sidebar.item>
+
                     <flux:sidebar.item icon="clipboard-document-list" :href="route('workout-plans.index')" :current="request()->routeIs('workout-plans.*')" wire:navigate>
                         {{ __('Workout plans') }}
                     </flux:sidebar.item>
