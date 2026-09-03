@@ -74,7 +74,7 @@ test('selecting an exercise shows only that exercise', function () {
         ->assertDontSee('Shoulder press');
 });
 
-test('owner can log completed reps, weight and difficulty for the active exercise', function () {
+test('owner can log completed reps, weight, difficulty and a note for the active exercise', function () {
     $user = User::factory()->create();
     $workout = Workout::factory()->for($user)->create();
     $exercise = WorkoutExercise::factory()->for($workout)->create([
@@ -92,6 +92,7 @@ test('owner can log completed reps, weight and difficulty for the active exercis
         ->set("exercises.{$exercise->id}.sets.{$secondSet->id}.completed_reps", 5)
         ->set("exercises.{$exercise->id}.sets.{$secondSet->id}.completed_weight", 47.5)
         ->set("exercises.{$exercise->id}.difficulty", 4)
+        ->set("exercises.{$exercise->id}.note", 'Left knee hurt on the last set.')
         ->call('save')
         ->assertHasNoErrors()
         ->assertSet('activeExerciseId', null)
@@ -104,6 +105,7 @@ test('owner can log completed reps, weight and difficulty for the active exercis
     expect($secondSet->refresh()->completed_reps)->toBe(5);
     expect((float) $secondSet->completed_weight)->toBe(47.5);
     expect($exercise->difficulty)->toBe(4);
+    expect($exercise->note)->toBe('Left knee hurt on the last set.');
 });
 
 test('difficulty must be between 1 and 5', function () {
@@ -121,4 +123,21 @@ test('difficulty must be between 1 and 5', function () {
         ->set("exercises.{$exercise->id}.difficulty", 6)
         ->call('save')
         ->assertHasErrors(["exercises.{$exercise->id}.difficulty" => 'max']);
+});
+
+test('note must not exceed 1000 characters', function () {
+    $user = User::factory()->create();
+    $workout = Workout::factory()->for($user)->create();
+    $exercise = WorkoutExercise::factory()->for($workout)->create([
+        'exercise_id' => Exercise::factory()->create(),
+    ]);
+    WorkoutExerciseSet::factory()->for($exercise, 'workoutExercise')->create();
+
+    $this->actingAs($user);
+
+    Livewire::test(Perform::class, ['workout' => $workout])
+        ->call('selectExercise', $exercise->id)
+        ->set("exercises.{$exercise->id}.note", str_repeat('a', 1001))
+        ->call('save')
+        ->assertHasErrors(["exercises.{$exercise->id}.note" => 'max']);
 });

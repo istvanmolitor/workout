@@ -23,7 +23,7 @@ class Perform extends Component
     public ?int $activeExerciseId = null;
 
     /**
-     * @var array<int, array{sets: array<int, array{reps: int, completed_reps: int|string|null, weight: string|null, completed_weight: int|string|null}>, difficulty: int|string|null}>
+     * @var array<int, array{sets: array<int, array{reps: int, completed_reps: int|string|null, weight: string|null, completed_weight: int|string|null}>, difficulty: int|string|null, note: string|null}>
      */
     public array $exercises = [];
 
@@ -58,6 +58,7 @@ class Perform extends Component
                         ])
                         ->all(),
                     'difficulty' => $exercise->difficulty,
+                    'note' => $exercise->note,
                 ],
             ])
             ->all();
@@ -109,6 +110,7 @@ class Perform extends Component
             "exercises.{$workoutExerciseId}.sets.*.completed_reps" => ['nullable', 'integer', 'min:0', 'max:999'],
             "exercises.{$workoutExerciseId}.sets.*.completed_weight" => ['nullable', 'numeric', 'min:0', 'max:9999.99'],
             "exercises.{$workoutExerciseId}.difficulty" => ['nullable', 'integer', 'min:1', 'max:5'],
+            "exercises.{$workoutExerciseId}.note" => ['nullable', 'string', 'max:1000'],
         ]);
 
         foreach ($validated['exercises'][$workoutExerciseId]['sets'] as $setId => $set) {
@@ -120,6 +122,7 @@ class Perform extends Component
 
         $this->workout->exercises()->whereKey($workoutExerciseId)->update([
             'difficulty' => $validated['exercises'][$workoutExerciseId]['difficulty'],
+            'note' => $validated['exercises'][$workoutExerciseId]['note'],
         ]);
 
         $this->logged[$workoutExerciseId] = true;

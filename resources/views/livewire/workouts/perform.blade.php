@@ -62,6 +62,16 @@
             </flux:radio.group>
             <flux:error name="exercises.{{ $activeExerciseId }}.difficulty" />
 
+            <div>
+                <flux:textarea
+                    wire:model="exercises.{{ $activeExerciseId }}.note"
+                    :label="__('Note')"
+                    :placeholder="__('Add a note about this exercise')"
+                    rows="3"
+                />
+                <flux:error name="exercises.{{ $activeExerciseId }}.note" />
+            </div>
+
             <flux:button type="submit" variant="primary" class="h-14 w-full text-lg">
                 {{ __('Save and back') }}
             </flux:button>

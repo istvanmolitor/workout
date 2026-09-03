@@ -1,5 +1,6 @@
 {
     "Add an exercise to your catalog": "Adj hozzá egy gyakorlatot a katalógusodhoz",
+    "Add a note about this exercise": "Adj hozzá egy megjegyzést ehhez a gyakorlathoz",
     "Add a passkey to sign in without a password": "Adj hozzá egy jelszókulcsot a jelszó nélküli bejelentkezéshez",
     "Added :time": ":time hozzáadva",
     "Add exercise": "Gyakorlat hozzáadása",
@@ -98,6 +99,7 @@
     "No workout plans yet": "Még nincs edzésterv",
     "No workouts yet": "Még nincsenek edzések",
     "Not logged yet": "Még nincs naplózva",
+    "Note": "Megjegyzés",
     "Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.": "A fiókod törlése után minden hozzá tartozó adat véglegesen törlődik. Add meg a jelszavad a fiók végleges törlésének megerősítéséhez.",
     "Or confirm with password": "Vagy erősítsd meg jelszóval",
     "Or continue with email": "Vagy folytasd emaillel",
