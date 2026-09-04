@@ -2,6 +2,8 @@
 
 use App\Livewire\Settings\Profile;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 test('profile page is displayed', function () {
@@ -73,4 +75,65 @@ test('correct password must be provided to delete account', function () {
     $response->assertHasErrors(['password']);
 
     expect($user->fresh())->not->toBeNull();
+});
+
+test('user can upload a profile picture', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    $response = Livewire::test(Profile::class)
+        ->set('avatar', UploadedFile::fake()->create('avatar.jpg', 10, 'image/jpeg'))
+        ->call('updateAvatar');
+
+    $response->assertHasNoErrors();
+
+    $user->refresh();
+
+    expect($user->avatar)->not->toBeNull();
+    Storage::disk('public')->assertExists($user->avatar);
+});
+
+test('uploading a new profile picture replaces the old one', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    Livewire::test(Profile::class)
+        ->set('avatar', UploadedFile::fake()->create('first.jpg', 10, 'image/jpeg'))
+        ->call('updateAvatar');
+
+    $firstAvatar = $user->refresh()->avatar;
+
+    Livewire::test(Profile::class)
+        ->set('avatar', UploadedFile::fake()->create('second.jpg', 10, 'image/jpeg'))
+        ->call('updateAvatar');
+
+    $user->refresh();
+
+    Storage::disk('public')->assertMissing($firstAvatar);
+    Storage::disk('public')->assertExists($user->avatar);
+});
+
+test('user can remove their profile picture', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    Livewire::test(Profile::class)
+        ->set('avatar', UploadedFile::fake()->create('avatar.jpg', 10, 'image/jpeg'))
+        ->call('updateAvatar');
+
+    $avatar = $user->refresh()->avatar;
+
+    Livewire::test(Profile::class)->call('removeAvatar');
+
+    Storage::disk('public')->assertMissing($avatar);
+    expect($user->refresh()->avatar)->toBeNull();
 });

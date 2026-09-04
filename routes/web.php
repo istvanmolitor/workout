@@ -16,11 +16,14 @@ use App\Livewire\ExerciseTypes\Manage as ManageExerciseTypes;
 use App\Livewire\Fields\Create as CreateField;
 use App\Livewire\Fields\Edit as EditField;
 use App\Livewire\Fields\Manage as ManageFields;
+use App\Livewire\Users\Following as FollowingUsers;
+use App\Livewire\Users\Search as SearchUsers;
 use App\Livewire\WorkoutPlans\Create as CreateWorkoutPlan;
 use App\Livewire\WorkoutPlans\Edit as EditWorkoutPlan;
 use App\Livewire\WorkoutPlans\Manage as ManageWorkoutPlans;
 use App\Livewire\Workouts\Calendar as WorkoutCalendar;
 use App\Livewire\Workouts\Edit as EditWorkout;
+use App\Livewire\Workouts\Feed as WorkoutFeed;
 use App\Livewire\Workouts\Manage as ManageWorkouts;
 use App\Livewire\Workouts\Perform as PerformWorkout;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::livewire('workouts', ManageWorkouts::class)->name('workouts.index');
     Route::livewire('workouts/calendar', WorkoutCalendar::class)->name('workouts.calendar');
+    Route::livewire('workouts/feed', WorkoutFeed::class)->name('workouts.feed');
     Route::livewire('workouts/{workout}/edit', EditWorkout::class)->name('workouts.edit');
     Route::livewire('workouts/{workout}/perform', PerformWorkout::class)->name('workouts.perform');
 
@@ -58,6 +62,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('fields', ManageFields::class)->name('fields.index');
     Route::livewire('fields/create', CreateField::class)->name('fields.create');
     Route::livewire('fields/{field}/edit', EditField::class)->name('fields.edit');
+
+    Route::livewire('users', SearchUsers::class)->name('users.index');
+    Route::livewire('users/following', FollowingUsers::class)->name('users.following');
 });
 
 require __DIR__.'/settings.php';
