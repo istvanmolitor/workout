@@ -13,12 +13,14 @@
     <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         @forelse ($this->following as $user)
             <flux:card wire:key="following-{{ $user->id }}" class="flex items-center gap-3">
-                <flux:avatar :src="$user->avatar_url" :name="$user->name" :initials="$user->initials()" />
+                <a href="{{ route('users.show', $user) }}" wire:navigate class="flex min-w-0 flex-1 items-center gap-3">
+                    <flux:avatar :src="$user->avatar_url" :name="$user->name" :initials="$user->initials()" />
 
-                <div class="min-w-0 flex-1">
-                    <flux:heading class="truncate">{{ $user->name }}</flux:heading>
-                    <flux:text class="truncate">{{ $user->email }}</flux:text>
-                </div>
+                    <div class="min-w-0 flex-1">
+                        <flux:heading class="truncate">{{ $user->name }}</flux:heading>
+                        <flux:text class="truncate">{{ $user->email }}</flux:text>
+                    </div>
+                </a>
 
                 <flux:button size="sm" variant="ghost" wire:click="unfollow({{ $user->id }})">
                     {{ __('Unfollow') }}

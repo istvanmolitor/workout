@@ -1,28 +1,32 @@
 <section class="w-full">
     <div class="flex flex-wrap items-center justify-between gap-4">
-        <div>
-            <flux:heading size="xl">{{ __('Followed workouts') }}</flux:heading>
-            <flux:subheading>{{ __('See what the users you follow have been up to') }}</flux:subheading>
+        <div class="flex items-center gap-3">
+            <flux:button variant="ghost" icon="arrow-left" :href="route('users.index')" wire:navigate />
+
+            <flux:avatar size="lg" :src="$user->avatar_url" :name="$user->name" :initials="$user->initials()" />
+
+            <div>
+                <flux:heading size="xl">{{ $user->name }}</flux:heading>
+                <flux:subheading>{{ __('Workouts') }}</flux:subheading>
+            </div>
         </div>
 
-        <flux:button variant="ghost" icon="user-group" :href="route('users.following')" wire:navigate>
-            {{ __('Following') }}
-        </flux:button>
+        @unless ($user->is(auth()->user()))
+            @if ($this->isFollowing)
+                <flux:button variant="ghost" wire:click="unfollow">
+                    {{ __('Unfollow') }}
+                </flux:button>
+            @else
+                <flux:button variant="primary" wire:click="follow">
+                    {{ __('Follow') }}
+                </flux:button>
+            @endif
+        @endunless
     </div>
 
     <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         @forelse ($this->workouts as $workout)
-            <flux:card wire:key="feed-workout-{{ $workout->id }}" class="space-y-3">
-                <a href="{{ route('users.show', $workout->user) }}" wire:navigate class="flex items-center gap-2">
-                    <flux:avatar
-                        size="sm"
-                        :src="$workout->user->avatar_url"
-                        :name="$workout->user->name"
-                        :initials="$workout->user->initials()"
-                    />
-                    <flux:text class="truncate">{{ $workout->user->name }}</flux:text>
-                </a>
-
+            <flux:card wire:key="profile-workout-{{ $workout->id }}" class="space-y-3">
                 <div>
                     <flux:heading>{{ $workout->name }}</flux:heading>
                     <flux:text class="mt-1">{{ $workout->performed_at->translatedFormat('Y. m. d.') }}</flux:text>
@@ -50,12 +54,7 @@
             </flux:card>
         @empty
             <div class="col-span-full p-8 text-center border rounded-lg border-zinc-200 dark:border-zinc-700">
-                <p class="font-medium">{{ __('Nothing to show yet') }}</p>
-                <flux:text class="mt-1">{{ __('Follow some users to see their workouts here') }}</flux:text>
-
-                <flux:button class="mt-4" variant="primary" :href="route('users.index')" wire:navigate>
-                    {{ __('Find users') }}
-                </flux:button>
+                <p class="font-medium">{{ __('No workouts yet') }}</p>
             </div>
         @endforelse
     </div>

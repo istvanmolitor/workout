@@ -18,6 +18,7 @@ use App\Livewire\Fields\Edit as EditField;
 use App\Livewire\Fields\Manage as ManageFields;
 use App\Livewire\Users\Following as FollowingUsers;
 use App\Livewire\Users\Search as SearchUsers;
+use App\Livewire\Users\Show as ShowUser;
 use App\Livewire\WorkoutPlans\Create as CreateWorkoutPlan;
 use App\Livewire\WorkoutPlans\Edit as EditWorkoutPlan;
 use App\Livewire\WorkoutPlans\Manage as ManageWorkoutPlans;
@@ -65,6 +66,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::livewire('users', SearchUsers::class)->name('users.index');
     Route::livewire('users/following', FollowingUsers::class)->name('users.following');
+    Route::livewire('users/{user}', ShowUser::class)->name('users.show');
 });
 
 require __DIR__.'/settings.php';

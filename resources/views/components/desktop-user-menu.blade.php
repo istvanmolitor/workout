@@ -8,7 +8,11 @@
     />
 
     <flux:menu>
-        <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
+        <a
+            href="{{ route('users.show', auth()->user()) }}"
+            wire:navigate
+            class="flex items-center gap-2 rounded px-1 py-1.5 text-start text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700"
+        >
             <flux:avatar
                 :src="auth()->user()->avatar_url"
                 :name="auth()->user()->name"
@@ -18,7 +22,7 @@
                 <flux:heading class="truncate">{{ auth()->user()->name }}</flux:heading>
                 <flux:text class="truncate">{{ auth()->user()->email }}</flux:text>
             </div>
-        </div>
+        </a>
         <flux:menu.separator />
         <flux:menu.radio.group>
             <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
