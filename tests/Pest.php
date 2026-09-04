@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\Exercise;
+use App\Models\ExerciseType;
+use App\Models\ExerciseTypeField;
+use App\Models\Field;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -47,4 +51,31 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+/**
+ * Create an exercise whose type tracks the given fields, in order.
+ */
+function createExerciseWithFields(string $name, array $fieldNames, bool $singleSet = false): Exercise
+{
+    $exerciseType = ExerciseType::factory()->create(['single_set' => $singleSet]);
+
+    foreach ($fieldNames as $order => $fieldName) {
+        $field = Field::query()->firstOrCreate(['name' => $fieldName]);
+        ExerciseTypeField::factory()->create([
+            'exercise_type_id' => $exerciseType->id,
+            'field_id' => $field->id,
+            'order' => $order,
+        ]);
+    }
+
+    return Exercise::factory()->create(['name' => $name, 'exercise_type_id' => $exerciseType->id]);
+}
+
+/**
+ * Get the id of the field with the given name tracked by the exercise's type.
+ */
+function fieldIdFor(Exercise $exercise, string $fieldName): int
+{
+    return $exercise->exerciseType->fields->first(fn ($typeField) => $typeField->field->name === $fieldName)->field_id;
 }

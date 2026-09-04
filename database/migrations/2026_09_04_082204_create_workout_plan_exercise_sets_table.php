@@ -14,8 +14,6 @@ return new class extends Migration
         Schema::create('workout_plan_exercise_sets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('workout_plan_exercise_id')->constrained()->cascadeOnDelete();
-            $table->unsignedInteger('reps');
-            $table->decimal('weight', 6, 2)->nullable();
             $table->unsignedInteger('order')->default(0);
             $table->timestamps();
 

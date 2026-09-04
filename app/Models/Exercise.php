@@ -14,11 +14,13 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $name
  * @property int|null $category_id
+ * @property int $exercise_type_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read ExerciseCategory|null $category
+ * @property-read ExerciseType $exerciseType
  */
-#[Fillable(['name', 'category_id'])]
+#[Fillable(['name', 'category_id', 'exercise_type_id'])]
 class Exercise extends Model
 {
     /** @use HasFactory<ExerciseFactory> */
@@ -32,6 +34,16 @@ class Exercise extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(ExerciseCategory::class, 'category_id');
+    }
+
+    /**
+     * Get the type that determines which fields this exercise tracks.
+     *
+     * @return BelongsTo<ExerciseType, $this>
+     */
+    public function exerciseType(): BelongsTo
+    {
+        return $this->belongsTo(ExerciseType::class);
     }
 
     /**

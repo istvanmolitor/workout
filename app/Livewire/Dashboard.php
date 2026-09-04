@@ -20,7 +20,7 @@ class Dashboard extends Component
     public function lastWorkout(): ?Workout
     {
         return Auth::user()->workouts()
-            ->with('exercises.exercise', 'exercises.sets')
+            ->with('exercises.exercise', 'exercises.sets.values.field')
             ->latest('performed_at')
             ->latest()
             ->first();

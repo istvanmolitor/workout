@@ -4,6 +4,7 @@ namespace App\Livewire\Exercises;
 
 use App\Models\Exercise;
 use App\Models\ExerciseCategory;
+use App\Models\ExerciseType;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
@@ -22,6 +23,8 @@ class Edit extends Component
 
     public ?int $category_id = null;
 
+    public ?int $exercise_type_id = null;
+
     /**
      * Mount the component.
      */
@@ -30,6 +33,7 @@ class Edit extends Component
         $this->exercise = $exercise;
         $this->name = $exercise->name;
         $this->category_id = $exercise->category_id;
+        $this->exercise_type_id = $exercise->exercise_type_id;
     }
 
     /**
@@ -44,6 +48,17 @@ class Edit extends Component
     }
 
     /**
+     * Get the exercise types available to choose from.
+     *
+     * @return Collection<int, ExerciseType>
+     */
+    #[Computed]
+    public function exerciseTypes(): Collection
+    {
+        return ExerciseType::query()->orderBy('name')->get();
+    }
+
+    /**
      * Update the exercise.
      */
     public function save(): void
@@ -51,6 +66,7 @@ class Edit extends Component
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('exercises', 'name')->ignore($this->exercise->id)],
             'category_id' => ['required', 'integer', 'exists:exercise_categories,id'],
+            'exercise_type_id' => ['required', 'integer', 'exists:exercise_types,id'],
         ]);
 
         $this->exercise->update($validated);

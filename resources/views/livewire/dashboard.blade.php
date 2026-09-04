@@ -25,9 +25,9 @@
                     @foreach ($this->lastWorkout->exercises as $exercise)
                         <li class="flex items-center justify-between text-sm">
                             <span>{{ $exercise->exercise->name }}</span>
-                            @if ($exercise->sets->contains(fn ($set) => $set->completed_reps !== null))
+                            @if ($exercise->sets->contains(fn ($set) => $set->values->contains(fn ($value) => $value->completed_value !== null)))
                                 <flux:badge size="sm">
-                                    {{ $exercise->sets->map(fn ($set) => ($set->completed_reps ?? '?').($set->completed_weight !== null ? '×'.rtrim(rtrim($set->completed_weight, '0'), '.').'kg' : ''))->join(', ') }}
+                                    {{ $exercise->sets->map(fn ($set) => $set->values->map(fn ($value) => rtrim(rtrim($value->completed_value ?? '?', '0'), '.').($value->field->unit ? ' '.$value->field->unit : ''))->join('×'))->join(', ') }}
                                     @if ($exercise->difficulty !== null)
                                         &middot; {{ $exercise->difficulty }}/5
                                     @endif

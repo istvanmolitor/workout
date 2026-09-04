@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\Workouts\Edit;
-use App\Models\Exercise;
 use App\Models\User;
 use App\Models\Workout;
 use App\Models\WorkoutExercise;
@@ -33,22 +32,27 @@ test('a user cannot view another user\'s workout', function () {
     $this->get(route('workouts.edit', $workout))->assertForbidden();
 });
 
-test('owner can log completed reps, weight and difficulty per set', function () {
+test('owner can log completed values and difficulty per set', function () {
     $user = User::factory()->create();
     $workout = Workout::factory()->for($user)->create();
-    $exercise = WorkoutExercise::factory()->for($workout)->create([
-        'exercise_id' => Exercise::factory()->create(),
-    ]);
-    $firstSet = WorkoutExerciseSet::factory()->for($exercise, 'workoutExercise')->create(['reps' => 12, 'weight' => 60, 'order' => 0]);
-    $secondSet = WorkoutExerciseSet::factory()->for($exercise, 'workoutExercise')->create(['reps' => 8, 'weight' => 70, 'order' => 1]);
+    $exerciseCatalog = createExerciseWithFields('Bench press', ['Reps', 'Weight']);
+    $reps = fieldIdFor($exerciseCatalog, 'Reps');
+    $weight = fieldIdFor($exerciseCatalog, 'Weight');
+    $exercise = WorkoutExercise::factory()->for($workout)->create(['exercise_id' => $exerciseCatalog->id]);
+    $firstSet = WorkoutExerciseSet::factory()->for($exercise, 'workoutExercise')->create(['order' => 0]);
+    $firstSet->values()->create(['field_id' => $reps, 'value' => 12]);
+    $firstSet->values()->create(['field_id' => $weight, 'value' => 60]);
+    $secondSet = WorkoutExerciseSet::factory()->for($exercise, 'workoutExercise')->create(['order' => 1]);
+    $secondSet->values()->create(['field_id' => $reps, 'value' => 8]);
+    $secondSet->values()->create(['field_id' => $weight, 'value' => 70]);
 
     $this->actingAs($user);
 
     Livewire::test(Edit::class, ['workout' => $workout])
-        ->set("exercises.{$exercise->id}.sets.{$firstSet->id}.completed_reps", 10)
-        ->set("exercises.{$exercise->id}.sets.{$firstSet->id}.completed_weight", 62.5)
-        ->set("exercises.{$exercise->id}.sets.{$secondSet->id}.completed_reps", 6)
-        ->set("exercises.{$exercise->id}.sets.{$secondSet->id}.completed_weight", 72.5)
+        ->set("exercises.{$exercise->id}.sets.{$firstSet->id}.values.{$reps}.completed_value", 10)
+        ->set("exercises.{$exercise->id}.sets.{$firstSet->id}.values.{$weight}.completed_value", 62.5)
+        ->set("exercises.{$exercise->id}.sets.{$secondSet->id}.values.{$reps}.completed_value", 6)
+        ->set("exercises.{$exercise->id}.sets.{$secondSet->id}.values.{$weight}.completed_value", 72.5)
         ->set("exercises.{$exercise->id}.difficulty", 4)
         ->call('save')
         ->assertHasNoErrors()
@@ -56,17 +60,18 @@ test('owner can log completed reps, weight and difficulty per set', function () 
 
     $exercise->refresh();
 
-    expect($firstSet->refresh()->completed_reps)->toBe(10);
-    expect((float) $firstSet->completed_weight)->toBe(62.5);
-    expect($secondSet->refresh()->completed_reps)->toBe(6);
-    expect((float) $secondSet->completed_weight)->toBe(72.5);
+    expect((int) $firstSet->values()->where('field_id', $reps)->first()->completed_value)->toBe(10);
+    expect((float) $firstSet->values()->where('field_id', $weight)->first()->completed_value)->toBe(62.5);
+    expect((int) $secondSet->values()->where('field_id', $reps)->first()->completed_value)->toBe(6);
+    expect((float) $secondSet->values()->where('field_id', $weight)->first()->completed_value)->toBe(72.5);
     expect($exercise->difficulty)->toBe(4);
 });
 
 test('difficulty must be between 1 and 5', function () {
     $user = User::factory()->create();
     $workout = Workout::factory()->for($user)->create();
-    $exercise = WorkoutExercise::factory()->for($workout)->create();
+    $exerciseCatalog = createExerciseWithFields('Bench press', ['Reps']);
+    $exercise = WorkoutExercise::factory()->for($workout)->create(['exercise_id' => $exerciseCatalog->id]);
     WorkoutExerciseSet::factory()->for($exercise, 'workoutExercise')->create();
 
     $this->actingAs($user);

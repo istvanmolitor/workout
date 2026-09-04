@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\WorkoutPlans\Edit;
-use App\Models\Exercise;
 use App\Models\User;
 use App\Models\WorkoutPlan;
 use App\Models\WorkoutPlanExercise;
@@ -36,16 +35,22 @@ test('a user cannot edit another user\'s workout plan', function () {
 test('owner can update the workout plan and its exercises', function () {
     $user = User::factory()->create();
     $workoutPlan = WorkoutPlan::factory()->for($user)->create(['name' => 'Push day']);
-    $oldExercise = WorkoutPlanExercise::factory()->for($workoutPlan)->create(['exercise_id' => Exercise::factory()->create(['name' => 'Old exercise'])]);
-    WorkoutPlanExerciseSet::factory()->for($oldExercise, 'workoutPlanExercise')->create(['reps' => 10]);
-    $benchPress = Exercise::factory()->create(['name' => 'Bench press']);
+    $oldExercise = WorkoutPlanExercise::factory()->for($workoutPlan)->create(['exercise_id' => createExerciseWithFields('Old exercise', ['Reps'])->id]);
+    WorkoutPlanExerciseSet::factory()->for($oldExercise, 'workoutPlanExercise')->create();
+    $benchPress = createExerciseWithFields('Bench press', ['Reps', 'Weight']);
+    $reps = fieldIdFor($benchPress, 'Reps');
+    $weight = fieldIdFor($benchPress, 'Weight');
 
     $this->actingAs($user);
 
     Livewire::test(Edit::class, ['workoutPlan' => $workoutPlan])
         ->set('name', 'Push day (updated)')
         ->set('exercises', [
-            ['exercise_id' => $benchPress->id, 'sets' => [['reps' => 12, 'weight' => 60], ['reps' => 10, 'weight' => 65], ['reps' => 8, 'weight' => 70]]],
+            ['exercise_id' => $benchPress->id, 'sets' => [
+                ['values' => [$reps => 12, $weight => 60]],
+                ['values' => [$reps => 10, $weight => 65]],
+                ['values' => [$reps => 8, $weight => 70]],
+            ]],
         ])
         ->call('save')
         ->assertHasNoErrors()
@@ -56,8 +61,30 @@ test('owner can update the workout plan and its exercises', function () {
     expect($workoutPlan->name)->toBe('Push day (updated)');
     expect($workoutPlan->exercises)->toHaveCount(1);
     expect($workoutPlan->exercises->first()->exercise->name)->toBe('Bench press');
-    expect($workoutPlan->exercises->first()->sets->pluck('reps')->all())->toBe([12, 10, 8]);
-    expect($workoutPlan->exercises->first()->sets->pluck('weight')->map(fn ($weight) => (float) $weight)->all())->toBe([60.0, 65.0, 70.0]);
+    expect($workoutPlan->exercises->first()->sets->map(fn ($set) => (int) $set->values->firstWhere('field_id', $reps)->value)->all())->toBe([12, 10, 8]);
+    expect($workoutPlan->exercises->first()->sets->map(fn ($set) => (float) $set->values->firstWhere('field_id', $weight)->value)->all())->toBe([60.0, 65.0, 70.0]);
+});
+
+test('a single-set exercise type rejects more than one set on update', function () {
+    $user = User::factory()->create();
+    $workoutPlan = WorkoutPlan::factory()->for($user)->create();
+    $exercise = createExerciseWithFields('Plank', ['Idő'], singleSet: true);
+    $time = fieldIdFor($exercise, 'Idő');
+
+    $this->actingAs($user);
+
+    Livewire::test(Edit::class, ['workoutPlan' => $workoutPlan])
+        ->set('name', 'Core nap')
+        ->set('exercises', [
+            ['exercise_id' => $exercise->id, 'sets' => [
+                ['values' => [$time => 30]],
+                ['values' => [$time => 45]],
+            ]],
+        ])
+        ->call('save')
+        ->assertHasErrors(['exercises.0.sets']);
+
+    expect($workoutPlan->refresh()->exercises)->toHaveCount(0);
 });
 
 test('workout plan name is required', function () {

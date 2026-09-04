@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\WorkoutPlans\Create;
-use App\Models\Exercise;
 use App\Models\User;
 use App\Models\WorkoutPlan;
 use Livewire\Livewire;
@@ -16,10 +15,13 @@ test('create workout plan page is displayed', function () {
     $this->get(route('workout-plans.create'))->assertOk();
 });
 
-test('authenticated user can create a workout plan with exercises and varying reps and weight per set', function () {
+test('authenticated user can create a workout plan with exercises and varying values per set', function () {
     $user = User::factory()->create();
-    $benchPress = Exercise::factory()->create(['name' => 'Bench press']);
-    $shoulderPress = Exercise::factory()->create(['name' => 'Shoulder press']);
+    $benchPress = createExerciseWithFields('Bench press', ['Reps', 'Weight']);
+    $reps = fieldIdFor($benchPress, 'Reps');
+    $weight = fieldIdFor($benchPress, 'Weight');
+    $shoulderPress = createExerciseWithFields('Shoulder press', ['Reps', 'Weight']);
+    $shoulderReps = fieldIdFor($shoulderPress, 'Reps');
 
     $this->actingAs($user);
 
@@ -27,8 +29,16 @@ test('authenticated user can create a workout plan with exercises and varying re
         ->set('name', 'Push day')
         ->set('description', 'Chest, shoulders and triceps')
         ->set('exercises', [
-            ['exercise_id' => $benchPress->id, 'sets' => [['reps' => 12, 'weight' => 60], ['reps' => 10, 'weight' => 65], ['reps' => 8, 'weight' => 70]]],
-            ['exercise_id' => $shoulderPress->id, 'sets' => [['reps' => 10, 'weight' => null], ['reps' => 10, 'weight' => null], ['reps' => 10, 'weight' => null]]],
+            ['exercise_id' => $benchPress->id, 'sets' => [
+                ['values' => [$reps => 12, $weight => 60]],
+                ['values' => [$reps => 10, $weight => 65]],
+                ['values' => [$reps => 8, $weight => 70]],
+            ]],
+            ['exercise_id' => $shoulderPress->id, 'sets' => [
+                ['values' => [$shoulderReps => 10]],
+                ['values' => [$shoulderReps => 10]],
+                ['values' => [$shoulderReps => 10]],
+            ]],
         ])
         ->call('save')
         ->assertHasNoErrors()
@@ -40,18 +50,19 @@ test('authenticated user can create a workout plan with exercises and varying re
     expect($workoutPlan->description)->toBe('Chest, shoulders and triceps');
     expect($workoutPlan->exercises)->toHaveCount(2);
     expect($workoutPlan->exercises->first()->exercise->name)->toBe('Bench press');
-    expect($workoutPlan->exercises->first()->sets->pluck('reps')->all())->toBe([12, 10, 8]);
-    expect($workoutPlan->exercises->first()->sets->pluck('weight')->map(fn ($weight) => (float) $weight)->all())->toBe([60.0, 65.0, 70.0]);
-    expect($workoutPlan->exercises->last()->sets->pluck('weight')->filter()->all())->toBe([]);
+    expect($workoutPlan->exercises->first()->sets->map(fn ($set) => $set->values->firstWhere('field_id', $reps)->value)->map(fn ($value) => (int) $value)->all())->toBe([12, 10, 8]);
+    expect($workoutPlan->exercises->first()->sets->map(fn ($set) => (float) $set->values->firstWhere('field_id', $weight)->value)->all())->toBe([60.0, 65.0, 70.0]);
+    expect($workoutPlan->exercises->last()->sets->first()->values)->toHaveCount(1);
 });
 
 test('workout plan name is required', function () {
     $this->actingAs(User::factory()->create());
-    $exercise = Exercise::factory()->create();
+    $exercise = createExerciseWithFields('Squat', ['Reps']);
+    $reps = fieldIdFor($exercise, 'Reps');
 
     Livewire::test(Create::class)
         ->set('name', '')
-        ->set('exercises', [['exercise_id' => $exercise->id, 'sets' => [['reps' => 8, 'weight' => null]]]])
+        ->set('exercises', [['exercise_id' => $exercise->id, 'sets' => [['values' => [$reps => 8]]]]])
         ->call('save')
         ->assertHasErrors(['name' => 'required']);
 });
@@ -71,14 +82,14 @@ test('exercise selection is required', function () {
 
     Livewire::test(Create::class)
         ->set('name', 'Push day')
-        ->set('exercises', [['exercise_id' => '', 'sets' => [['reps' => 8, 'weight' => null]]]])
+        ->set('exercises', [['exercise_id' => '', 'sets' => [['values' => []]]]])
         ->call('save')
         ->assertHasErrors(['exercises.0.exercise_id' => 'required']);
 });
 
 test('at least one set is required per exercise', function () {
     $this->actingAs(User::factory()->create());
-    $exercise = Exercise::factory()->create();
+    $exercise = createExerciseWithFields('Squat', ['Reps']);
 
     Livewire::test(Create::class)
         ->set('name', 'Push day')
@@ -87,13 +98,61 @@ test('at least one set is required per exercise', function () {
         ->assertHasErrors(['exercises.0.sets' => 'required']);
 });
 
-test('set weight must be a non-negative number', function () {
+test('set field value must be a non-negative number', function () {
     $this->actingAs(User::factory()->create());
-    $exercise = Exercise::factory()->create();
+    $exercise = createExerciseWithFields('Squat', ['Reps']);
+    $reps = fieldIdFor($exercise, 'Reps');
 
     Livewire::test(Create::class)
         ->set('name', 'Push day')
-        ->set('exercises', [['exercise_id' => $exercise->id, 'sets' => [['reps' => 8, 'weight' => -5]]]])
+        ->set('exercises', [['exercise_id' => $exercise->id, 'sets' => [['values' => [$reps => -5]]]]])
         ->call('save')
-        ->assertHasErrors(['exercises.0.sets.0.weight' => 'min']);
+        ->assertHasErrors(["exercises.0.sets.0.values.{$reps}" => 'min']);
+});
+
+test('selecting a single-set exercise trims existing sets to one', function () {
+    $this->actingAs(User::factory()->create());
+    $exercise = createExerciseWithFields('Plank', ['Idő'], singleSet: true);
+
+    Livewire::test(Create::class)
+        ->set('exercises.0.exercise_id', $exercise->id)
+        ->assertCount('exercises.0.sets', 1);
+});
+
+test('a single-set exercise type can be saved with exactly one set', function () {
+    $user = User::factory()->create();
+    $exercise = createExerciseWithFields('Plank', ['Idő'], singleSet: true);
+    $time = fieldIdFor($exercise, 'Idő');
+
+    $this->actingAs($user);
+
+    Livewire::test(Create::class)
+        ->set('name', 'Core nap')
+        ->set('exercises', [['exercise_id' => $exercise->id, 'sets' => [['values' => [$time => 60]]]]])
+        ->call('save')
+        ->assertHasNoErrors()
+        ->assertRedirect(route('workout-plans.index'));
+
+    $workoutPlan = WorkoutPlan::query()->where('user_id', $user->id)->sole();
+
+    expect($workoutPlan->exercises->first()->sets)->toHaveCount(1);
+});
+
+test('a single-set exercise type rejects more than one set', function () {
+    $this->actingAs(User::factory()->create());
+    $exercise = createExerciseWithFields('Plank', ['Idő'], singleSet: true);
+    $time = fieldIdFor($exercise, 'Idő');
+
+    Livewire::test(Create::class)
+        ->set('name', 'Core nap')
+        ->set('exercises', [
+            ['exercise_id' => $exercise->id, 'sets' => [
+                ['values' => [$time => 30]],
+                ['values' => [$time => 45]],
+            ]],
+        ])
+        ->call('save')
+        ->assertHasErrors(['exercises.0.sets']);
+
+    expect(WorkoutPlan::query()->count())->toBe(0);
 });

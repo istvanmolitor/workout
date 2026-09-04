@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\WorkoutPlans\Manage;
-use App\Models\Exercise;
 use App\Models\User;
 use App\Models\Workout;
 use App\Models\WorkoutPlan;
@@ -38,13 +37,19 @@ test('user only sees their own workout plans', function () {
 test('owner can start a workout from a workout plan, copying its exercises and sets', function () {
     $user = User::factory()->create();
     $workoutPlan = WorkoutPlan::factory()->for($user)->create(['name' => 'Push day']);
-    $benchPress = Exercise::factory()->create(['name' => 'Bench press']);
+    $benchPress = createExerciseWithFields('Bench press', ['Reps', 'Weight']);
+    $reps = fieldIdFor($benchPress, 'Reps');
+    $weight = fieldIdFor($benchPress, 'Weight');
     $planExercise = WorkoutPlanExercise::factory()->for($workoutPlan)->create([
         'exercise_id' => $benchPress->id,
         'order' => 0,
     ]);
-    WorkoutPlanExerciseSet::factory()->for($planExercise, 'workoutPlanExercise')->create(['reps' => 12, 'weight' => 60, 'order' => 0]);
-    WorkoutPlanExerciseSet::factory()->for($planExercise, 'workoutPlanExercise')->create(['reps' => 8, 'weight' => 70, 'order' => 1]);
+    $firstSet = WorkoutPlanExerciseSet::factory()->for($planExercise, 'workoutPlanExercise')->create(['order' => 0]);
+    $firstSet->values()->create(['field_id' => $reps, 'value' => 12]);
+    $firstSet->values()->create(['field_id' => $weight, 'value' => 60]);
+    $secondSet = WorkoutPlanExerciseSet::factory()->for($planExercise, 'workoutPlanExercise')->create(['order' => 1]);
+    $secondSet->values()->create(['field_id' => $reps, 'value' => 8]);
+    $secondSet->values()->create(['field_id' => $weight, 'value' => 70]);
 
     $this->actingAs($user);
 
@@ -58,10 +63,10 @@ test('owner can start a workout from a workout plan, copying its exercises and s
     expect($workout->name)->toBe('Push day');
     expect($workout->exercises)->toHaveCount(1);
     expect($workout->exercises->first()->exercise_id)->toBe($benchPress->id);
-    expect($workout->exercises->first()->sets->pluck('reps')->all())->toBe([12, 8]);
-    expect($workout->exercises->first()->sets->pluck('completed_reps')->all())->toBe([null, null]);
-    expect($workout->exercises->first()->sets->pluck('weight')->map(fn ($weight) => (float) $weight)->all())->toBe([60.0, 70.0]);
-    expect($workout->exercises->first()->sets->pluck('completed_weight')->all())->toBe([null, null]);
+    expect($workout->exercises->first()->sets->map(fn ($set) => (int) $set->values->firstWhere('field_id', $reps)->value)->all())->toBe([12, 8]);
+    expect($workout->exercises->first()->sets->map(fn ($set) => $set->values->firstWhere('field_id', $reps)->completed_value)->all())->toBe([null, null]);
+    expect($workout->exercises->first()->sets->map(fn ($set) => (float) $set->values->firstWhere('field_id', $weight)->value)->all())->toBe([60.0, 70.0]);
+    expect($workout->exercises->first()->sets->map(fn ($set) => $set->values->firstWhere('field_id', $weight)->completed_value)->all())->toBe([null, null]);
 });
 
 test('a user cannot start a workout from another user\'s workout plan', function () {

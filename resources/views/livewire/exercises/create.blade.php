@@ -17,6 +17,12 @@
             @endforeach
         </flux:select>
 
+        <flux:select wire:model="exercise_type_id" :label="__('Exercise type')" :placeholder="__('Select exercise type')">
+            @foreach ($this->exerciseTypes as $exerciseType)
+                <flux:select.option value="{{ $exerciseType->id }}">{{ $exerciseType->name }}</flux:select.option>
+            @endforeach
+        </flux:select>
+
         <div class="flex items-center gap-4">
             <flux:button type="submit" variant="primary">
                 {{ __('Create exercise') }}

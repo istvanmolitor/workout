@@ -13,7 +13,12 @@
 
         <flux:textarea wire:model="description" :label="__('Description')" rows="2" />
 
-        <x-workout-plans.exercise-fields :exercises="$exercises" :available-exercises="$this->availableExercises" />
+        <x-workout-plans.exercise-fields
+            :exercises="$exercises"
+            :available-exercises="$this->availableExercises"
+            :fields-for-exercise="fn ($exerciseId) => $this->fieldsForExercise($exerciseId)"
+            :is-single-set="fn ($exerciseId) => $this->isSingleSet($exerciseId)"
+        />
 
         <div class="flex items-center gap-4">
             <flux:button type="submit" variant="primary">

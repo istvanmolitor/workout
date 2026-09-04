@@ -3,6 +3,7 @@
 use App\Livewire\Exercises\Edit;
 use App\Models\Exercise;
 use App\Models\ExerciseCategory;
+use App\Models\ExerciseType;
 use App\Models\User;
 use Livewire\Livewire;
 
@@ -91,4 +92,29 @@ test('exercise category can be updated', function () {
         ->assertHasNoErrors();
 
     expect($exercise->refresh()->category_id)->toBe($category->id);
+});
+
+test('exercise type is required', function () {
+    $this->actingAs(User::factory()->create());
+
+    $exercise = Exercise::factory()->create();
+
+    Livewire::test(Edit::class, ['exercise' => $exercise])
+        ->set('exercise_type_id', null)
+        ->call('save')
+        ->assertHasErrors(['exercise_type_id' => 'required']);
+});
+
+test('exercise type can be updated', function () {
+    $this->actingAs(User::factory()->create());
+
+    $exercise = Exercise::factory()->create();
+    $exerciseType = ExerciseType::factory()->create();
+
+    Livewire::test(Edit::class, ['exercise' => $exercise])
+        ->set('exercise_type_id', $exerciseType->id)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect($exercise->refresh()->exercise_type_id)->toBe($exerciseType->id);
 });

@@ -21,7 +21,7 @@ class Manage extends Component
     #[Computed]
     public function workoutPlans(): Collection
     {
-        return Auth::user()->workoutPlans()->with('exercises.exercise', 'exercises.sets')->latest()->get();
+        return Auth::user()->workoutPlans()->with('exercises.exercise', 'exercises.sets.values.field')->latest()->get();
     }
 
     /**
@@ -37,6 +37,8 @@ class Manage extends Component
             'performed_at' => now()->toDateString(),
         ]);
 
+        $workoutPlan->load('exercises.sets.values');
+
         foreach ($workoutPlan->exercises as $planExercise) {
             $workoutExercise = $workout->exercises()->create([
                 'exercise_id' => $planExercise->exercise_id,
@@ -44,11 +46,14 @@ class Manage extends Component
             ]);
 
             foreach ($planExercise->sets as $planSet) {
-                $workoutExercise->sets()->create([
-                    'reps' => $planSet->reps,
-                    'weight' => $planSet->weight,
-                    'order' => $planSet->order,
-                ]);
+                $workoutSet = $workoutExercise->sets()->create(['order' => $planSet->order]);
+
+                foreach ($planSet->values as $planValue) {
+                    $workoutSet->values()->create([
+                        'field_id' => $planValue->field_id,
+                        'value' => $planValue->value,
+                    ]);
+                }
             }
         }
 

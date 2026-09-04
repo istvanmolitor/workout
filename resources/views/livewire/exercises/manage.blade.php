@@ -39,9 +39,12 @@
                 <div>
                     <flux:text class="font-medium">{{ $exercise->name }}</flux:text>
 
-                    @if ($exercise->category)
-                        <flux:badge size="sm" class="mt-2">{{ $exercise->category->name }}</flux:badge>
-                    @endif
+                    <div class="mt-2 flex flex-wrap gap-1">
+                        @if ($exercise->category)
+                            <flux:badge size="sm">{{ $exercise->category->name }}</flux:badge>
+                        @endif
+                        <flux:badge size="sm" color="zinc">{{ $exercise->exerciseType->name }}</flux:badge>
+                    </div>
                 </div>
             </flux:card>
         @empty

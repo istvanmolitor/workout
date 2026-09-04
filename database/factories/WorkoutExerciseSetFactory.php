@@ -20,10 +20,6 @@ class WorkoutExerciseSetFactory extends Factory
     {
         return [
             'workout_exercise_id' => WorkoutExercise::factory(),
-            'reps' => fake()->numberBetween(1, 20),
-            'completed_reps' => null,
-            'weight' => fake()->randomFloat(2, 2.5, 100),
-            'completed_weight' => null,
             'order' => 0,
         ];
     }

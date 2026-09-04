@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Exercise;
 use App\Models\ExerciseCategory;
+use App\Models\ExerciseType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,6 +22,7 @@ class ExerciseFactory extends Factory
         return [
             'name' => fake()->unique()->words(2, true),
             'category_id' => ExerciseCategory::factory(),
+            'exercise_type_id' => ExerciseType::factory(),
         ];
     }
 }

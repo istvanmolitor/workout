@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('workout_exercises', function (Blueprint $table) {
-            $table->text('note')->nullable()->after('difficulty');
+        Schema::create('fields', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->string('unit')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('workout_exercises', function (Blueprint $table) {
-            $table->dropColumn('note');
-        });
+        Schema::dropIfExists('fields');
     }
 };

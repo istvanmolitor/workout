@@ -4,6 +4,7 @@ namespace App\Livewire\Exercises;
 
 use App\Models\Exercise;
 use App\Models\ExerciseCategory;
+use App\Models\ExerciseType;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
@@ -17,6 +18,8 @@ class Create extends Component
 
     public ?int $category_id = null;
 
+    public ?int $exercise_type_id = null;
+
     /**
      * Get the categories available to choose from.
      *
@@ -29,6 +32,17 @@ class Create extends Component
     }
 
     /**
+     * Get the exercise types available to choose from.
+     *
+     * @return Collection<int, ExerciseType>
+     */
+    #[Computed]
+    public function exerciseTypes(): Collection
+    {
+        return ExerciseType::query()->orderBy('name')->get();
+    }
+
+    /**
      * Create the exercise in the catalog.
      */
     public function save(): void
@@ -36,6 +50,7 @@ class Create extends Component
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255', 'unique:exercises,name'],
             'category_id' => ['required', 'integer', 'exists:exercise_categories,id'],
+            'exercise_type_id' => ['required', 'integer', 'exists:exercise_types,id'],
         ]);
 
         Exercise::query()->create($validated);

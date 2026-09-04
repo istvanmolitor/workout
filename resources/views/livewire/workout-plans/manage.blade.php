@@ -53,7 +53,7 @@
                         <li class="flex items-center justify-between text-sm">
                             <span>{{ $exercise->exercise->name }}</span>
                             <flux:badge size="sm">
-                                {{ $exercise->sets->map(fn ($set) => $set->weight !== null ? "{$set->reps}×".rtrim(rtrim($set->weight, '0'), '.').'kg' : $set->reps)->join(', ') }}
+                                {{ $exercise->sets->map(fn ($set) => $set->values->map(fn ($value) => rtrim(rtrim($value->value, '0'), '.').($value->field->unit ? ' '.$value->field->unit : ''))->join('×'))->join(', ') }}
                             </flux:badge>
                         </li>
                     @endforeach

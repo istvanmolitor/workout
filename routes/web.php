@@ -10,6 +10,12 @@ use App\Livewire\ExerciseCategories\Manage as ManageExerciseCategories;
 use App\Livewire\Exercises\Create as CreateExercise;
 use App\Livewire\Exercises\Edit as EditExercise;
 use App\Livewire\Exercises\Manage as ManageExercises;
+use App\Livewire\ExerciseTypes\Create as CreateExerciseType;
+use App\Livewire\ExerciseTypes\Edit as EditExerciseType;
+use App\Livewire\ExerciseTypes\Manage as ManageExerciseTypes;
+use App\Livewire\Fields\Create as CreateField;
+use App\Livewire\Fields\Edit as EditField;
+use App\Livewire\Fields\Manage as ManageFields;
 use App\Livewire\WorkoutPlans\Create as CreateWorkoutPlan;
 use App\Livewire\WorkoutPlans\Edit as EditWorkoutPlan;
 use App\Livewire\WorkoutPlans\Manage as ManageWorkoutPlans;
@@ -44,6 +50,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('exercise-categories', ManageExerciseCategories::class)->name('exercise-categories.index');
     Route::livewire('exercise-categories/create', CreateExerciseCategory::class)->name('exercise-categories.create');
     Route::livewire('exercise-categories/{exerciseCategory}/edit', EditExerciseCategory::class)->name('exercise-categories.edit');
+
+    Route::livewire('exercise-types', ManageExerciseTypes::class)->name('exercise-types.index');
+    Route::livewire('exercise-types/create', CreateExerciseType::class)->name('exercise-types.create');
+    Route::livewire('exercise-types/{exerciseType}/edit', EditExerciseType::class)->name('exercise-types.edit');
+
+    Route::livewire('fields', ManageFields::class)->name('fields.index');
+    Route::livewire('fields/create', CreateField::class)->name('fields.create');
+    Route::livewire('fields/{field}/edit', EditField::class)->name('fields.edit');
 });
 
 require __DIR__.'/settings.php';

@@ -13,34 +13,31 @@
             <div wire:key="workout-exercise-{{ $exercise->id }}" class="space-y-2">
                 <flux:heading>{{ $exercise->exercise->name }}</flux:heading>
 
-                <div class="flex flex-wrap items-start gap-2">
+                <div class="flex flex-wrap items-start gap-3">
                     @foreach ($exercise->sets as $set)
-                        <div wire:key="workout-exercise-{{ $exercise->id }}-set-{{ $set->id }}" class="flex items-start gap-2">
-                            <div>
-                                <flux:input
-                                    wire:model="exercises.{{ $exercise->id }}.sets.{{ $set->id }}.completed_reps"
-                                    type="number"
-                                    min="0"
-                                    :label="__('Set :number (planned: :reps)', ['number' => $loop->iteration, 'reps' => $set->reps])"
-                                    class="w-32"
-                                />
-                                <flux:error name="exercises.{{ $exercise->id }}.sets.{{ $set->id }}.completed_reps" />
-                            </div>
+                        <div wire:key="workout-exercise-{{ $exercise->id }}-set-{{ $set->id }}" class="space-y-1">
+                            <flux:text class="text-xs font-medium">{{ __('Set :number', ['number' => $loop->iteration]) }}</flux:text>
 
-                            <div>
-                                <flux:input
-                                    wire:model="exercises.{{ $exercise->id }}.sets.{{ $set->id }}.completed_weight"
-                                    type="number"
-                                    step="0.5"
-                                    min="0"
-                                    :label="$set->weight !== null ? __('Weight (planned: :weight kg)', ['weight' => rtrim(rtrim($set->weight, '0'), '.')]) : __('Weight (kg)')"
-                                    class="w-32"
-                                />
-                                <flux:error name="exercises.{{ $exercise->id }}.sets.{{ $set->id }}.completed_weight" />
+                            <div class="flex items-start gap-2">
+                                @foreach ($set->values as $value)
+                                    @php($label = $value->field->unit ? "{$value->field->name} ({$value->field->unit})" : $value->field->name)
+                                    @php($label .= $value->value !== null ? ' '.__('(planned: :value)', ['value' => rtrim(rtrim($value->value, '0'), '.')]) : '')
+
+                                    <div>
+                                        <flux:input
+                                            wire:model="exercises.{{ $exercise->id }}.sets.{{ $set->id }}.values.{{ $value->field_id }}.completed_value"
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            :label="$label"
+                                            class="w-32"
+                                        />
+                                        <flux:error name="exercises.{{ $exercise->id }}.sets.{{ $set->id }}.values.{{ $value->field_id }}.completed_value" />
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     @endforeach
-
                 </div>
 
                 <flux:radio.group wire:model="exercises.{{ $exercise->id }}.difficulty" :label="__('Difficulty')">
