@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Exercises;
 
-use App\Models\Exercise;
 use App\Models\ExerciseCategory;
 use App\Models\ExerciseType;
+use App\Repositories\Contracts\ExerciseCategoryRepositoryInterface;
+use App\Repositories\Contracts\ExerciseRepositoryInterface;
+use App\Repositories\Contracts\ExerciseTypeRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
@@ -14,11 +16,27 @@ use Livewire\Component;
 #[Title('Új gyakorlat')]
 class Create extends Component
 {
+    protected ExerciseRepositoryInterface $exerciseRepository;
+
+    protected ExerciseCategoryRepositoryInterface $exerciseCategoryRepository;
+
+    protected ExerciseTypeRepositoryInterface $exerciseTypeRepository;
+
     public string $name = '';
 
     public ?int $category_id = null;
 
     public ?int $exercise_type_id = null;
+
+    public function boot(
+        ExerciseRepositoryInterface $exerciseRepository,
+        ExerciseCategoryRepositoryInterface $exerciseCategoryRepository,
+        ExerciseTypeRepositoryInterface $exerciseTypeRepository,
+    ): void {
+        $this->exerciseRepository = $exerciseRepository;
+        $this->exerciseCategoryRepository = $exerciseCategoryRepository;
+        $this->exerciseTypeRepository = $exerciseTypeRepository;
+    }
 
     /**
      * Get the categories available to choose from.
@@ -28,7 +46,7 @@ class Create extends Component
     #[Computed]
     public function categories(): Collection
     {
-        return ExerciseCategory::query()->orderBy('name')->get();
+        return $this->exerciseCategoryRepository->all();
     }
 
     /**
@@ -39,7 +57,7 @@ class Create extends Component
     #[Computed]
     public function exerciseTypes(): Collection
     {
-        return ExerciseType::query()->orderBy('name')->get();
+        return $this->exerciseTypeRepository->all();
     }
 
     /**
@@ -53,7 +71,7 @@ class Create extends Component
             'exercise_type_id' => ['required', 'integer', 'exists:exercise_types,id'],
         ]);
 
-        Exercise::query()->create($validated);
+        $this->exerciseRepository->create($validated);
 
         Flux::toast(variant: 'success', text: __('Exercise created.'));
 

@@ -3,6 +3,7 @@
 namespace App\Livewire\ExerciseTypes;
 
 use App\Models\ExerciseType;
+use App\Repositories\Contracts\ExerciseTypeRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
@@ -13,6 +14,13 @@ use Livewire\Component;
 #[Title('Gyakorlattípusok')]
 class Manage extends Component
 {
+    protected ExerciseTypeRepositoryInterface $exerciseTypeRepository;
+
+    public function boot(ExerciseTypeRepositoryInterface $exerciseTypeRepository): void
+    {
+        $this->exerciseTypeRepository = $exerciseTypeRepository;
+    }
+
     /**
      * Get all exercise types with their tracked fields.
      *
@@ -21,7 +29,7 @@ class Manage extends Component
     #[Computed]
     public function exerciseTypes(): Collection
     {
-        return ExerciseType::query()->with('fields.field')->orderBy('name')->get();
+        return $this->exerciseTypeRepository->allWithFields();
     }
 
     /**
@@ -30,7 +38,7 @@ class Manage extends Component
     public function delete(ExerciseType $exerciseType): void
     {
         try {
-            $exerciseType->delete();
+            $this->exerciseTypeRepository->delete($exerciseType);
         } catch (QueryException) {
             Flux::toast(variant: 'danger', text: __('This exercise type is used by an exercise and cannot be deleted.'));
 

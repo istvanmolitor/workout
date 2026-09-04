@@ -6,6 +6,7 @@ use App\Models\Workout;
 use App\Models\WorkoutExercise;
 use App\Models\WorkoutExerciseSet;
 use App\Models\WorkoutExerciseSetValue;
+use App\Repositories\Contracts\WorkoutRepositoryInterface;
 use Flux\Flux;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -17,6 +18,8 @@ use Livewire\Component;
 #[Title('Edzés')]
 class Perform extends Component
 {
+    protected WorkoutRepositoryInterface $workoutRepository;
+
     #[Locked]
     public Workout $workout;
 
@@ -34,6 +37,11 @@ class Perform extends Component
      * @var array<int, bool>
      */
     public array $logged = [];
+
+    public function boot(WorkoutRepositoryInterface $workoutRepository): void
+    {
+        $this->workoutRepository = $workoutRepository;
+    }
 
     /**
      * Mount the component.
@@ -121,14 +129,11 @@ class Perform extends Component
 
         foreach ($this->exercises[$workoutExerciseId]['sets'] as $setId => $set) {
             foreach ($set['values'] as $fieldId => $value) {
-                WorkoutExerciseSetValue::query()
-                    ->where('workout_exercise_set_id', $setId)
-                    ->where('field_id', $fieldId)
-                    ->update(['completed_value' => $value['completed_value'] === '' ? null : $value['completed_value']]);
+                $this->workoutRepository->updateSetValueCompletion($setId, $fieldId, $value['completed_value']);
             }
         }
 
-        $this->workout->exercises()->whereKey($workoutExerciseId)->update([
+        $this->workoutRepository->updateExercise($this->workout, $workoutExerciseId, [
             'difficulty' => $this->exercises[$workoutExerciseId]['difficulty'],
             'note' => $this->exercises[$workoutExerciseId]['note'],
         ]);

@@ -3,6 +3,7 @@
 namespace App\Livewire\Users;
 
 use App\Models\User;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,14 @@ class Search extends Component
 {
     use WithPagination;
 
+    protected UserRepositoryInterface $userRepository;
+
     public string $search = '';
+
+    public function boot(UserRepositoryInterface $userRepository): void
+    {
+        $this->userRepository = $userRepository;
+    }
 
     /**
      * Get the users matching the current search term, excluding the authenticated user.
@@ -26,14 +34,7 @@ class Search extends Component
     #[Computed]
     public function users(): LengthAwarePaginator
     {
-        return User::query()
-            ->where('id', '!=', Auth::id())
-            ->when($this->search !== '', fn ($query) => $query->where(
-                fn ($query) => $query->where('name', 'like', "%{$this->search}%")
-                    ->orWhere('email', 'like', "%{$this->search}%")
-            ))
-            ->orderBy('name')
-            ->paginate(15);
+        return $this->userRepository->search(Auth::id(), $this->search);
     }
 
     /**
@@ -44,7 +45,7 @@ class Search extends Component
     #[Computed]
     public function followingIds(): array
     {
-        return Auth::user()->following()->pluck('users.id')->all();
+        return $this->userRepository->followingIds(Auth::user());
     }
 
     /**
@@ -60,7 +61,7 @@ class Search extends Component
      */
     public function follow(User $user): void
     {
-        Auth::user()->following()->syncWithoutDetaching([$user->id]);
+        $this->userRepository->follow(Auth::user(), $user);
 
         unset($this->followingIds);
 
@@ -72,7 +73,7 @@ class Search extends Component
      */
     public function unfollow(User $user): void
     {
-        Auth::user()->following()->detach($user->id);
+        $this->userRepository->unfollow(Auth::user(), $user);
 
         unset($this->followingIds);
 

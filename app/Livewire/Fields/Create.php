@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Fields;
 
-use App\Models\Field;
+use App\Repositories\Contracts\FieldRepositoryInterface;
 use Flux\Flux;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -10,9 +10,16 @@ use Livewire\Component;
 #[Title('Új mező')]
 class Create extends Component
 {
+    protected FieldRepositoryInterface $fieldRepository;
+
     public string $name = '';
 
     public string $unit = '';
+
+    public function boot(FieldRepositoryInterface $fieldRepository): void
+    {
+        $this->fieldRepository = $fieldRepository;
+    }
 
     /**
      * Create the field in the catalog.
@@ -24,7 +31,7 @@ class Create extends Component
             'unit' => ['nullable', 'string', 'max:50'],
         ]);
 
-        Field::query()->create([
+        $this->fieldRepository->create([
             'name' => $validated['name'],
             'unit' => $validated['unit'] !== '' ? $validated['unit'] : null,
         ]);

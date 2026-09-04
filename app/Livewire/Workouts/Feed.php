@@ -3,6 +3,7 @@
 namespace App\Livewire\Workouts;
 
 use App\Models\Workout;
+use App\Repositories\Contracts\WorkoutRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -15,6 +16,13 @@ class Feed extends Component
 {
     use WithPagination;
 
+    protected WorkoutRepositoryInterface $workoutRepository;
+
+    public function boot(WorkoutRepositoryInterface $workoutRepository): void
+    {
+        $this->workoutRepository = $workoutRepository;
+    }
+
     /**
      * Get the logged workouts of the users the authenticated user is following.
      *
@@ -23,11 +31,6 @@ class Feed extends Component
     #[Computed]
     public function workouts(): LengthAwarePaginator
     {
-        return Workout::query()
-            ->whereIn('user_id', Auth::user()->following()->pluck('users.id'))
-            ->with('user', 'exercises.exercise', 'exercises.sets.values.field')
-            ->latest('performed_at')
-            ->latest()
-            ->paginate(10);
+        return $this->workoutRepository->feedForFollowing(Auth::user());
     }
 }

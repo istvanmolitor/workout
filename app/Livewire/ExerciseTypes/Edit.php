@@ -4,6 +4,8 @@ namespace App\Livewire\ExerciseTypes;
 
 use App\Models\ExerciseType;
 use App\Models\Field;
+use App\Repositories\Contracts\ExerciseTypeRepositoryInterface;
+use App\Repositories\Contracts\FieldRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
@@ -15,6 +17,10 @@ use Livewire\Component;
 #[Title('Gyakorlattípus szerkesztése')]
 class Edit extends Component
 {
+    protected ExerciseTypeRepositoryInterface $exerciseTypeRepository;
+
+    protected FieldRepositoryInterface $fieldRepository;
+
     #[Locked]
     public ExerciseType $exerciseType;
 
@@ -26,6 +32,12 @@ class Edit extends Component
      * @var array<int, array{field_id: int|string}>
      */
     public array $fields = [];
+
+    public function boot(ExerciseTypeRepositoryInterface $exerciseTypeRepository, FieldRepositoryInterface $fieldRepository): void
+    {
+        $this->exerciseTypeRepository = $exerciseTypeRepository;
+        $this->fieldRepository = $fieldRepository;
+    }
 
     /**
      * Mount the component.
@@ -53,7 +65,7 @@ class Edit extends Component
     #[Computed]
     public function availableFields(): Collection
     {
-        return Field::query()->orderBy('name')->get();
+        return $this->fieldRepository->all();
     }
 
     /**
@@ -86,19 +98,10 @@ class Edit extends Component
             'fields.*.field_id' => ['required', 'integer', 'distinct', 'exists:fields,id'],
         ]);
 
-        $this->exerciseType->update([
+        $this->exerciseTypeRepository->update($this->exerciseType, [
             'name' => $validated['name'],
             'single_set' => $validated['single_set'],
-        ]);
-
-        $this->exerciseType->fields()->delete();
-
-        foreach ($validated['fields'] as $order => $field) {
-            $this->exerciseType->fields()->create([
-                'field_id' => $field['field_id'],
-                'order' => $order,
-            ]);
-        }
+        ], $validated['fields']);
 
         Flux::toast(variant: 'success', text: __('Exercise type updated.'));
 

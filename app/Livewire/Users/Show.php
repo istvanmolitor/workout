@@ -4,6 +4,8 @@ namespace App\Livewire\Users;
 
 use App\Models\User;
 use App\Models\Workout;
+use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\Contracts\WorkoutRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -18,8 +20,18 @@ class Show extends Component
 {
     use WithPagination;
 
+    protected WorkoutRepositoryInterface $workoutRepository;
+
+    protected UserRepositoryInterface $userRepository;
+
     #[Locked]
     public User $user;
+
+    public function boot(WorkoutRepositoryInterface $workoutRepository, UserRepositoryInterface $userRepository): void
+    {
+        $this->workoutRepository = $workoutRepository;
+        $this->userRepository = $userRepository;
+    }
 
     /**
      * Mount the component.
@@ -37,11 +49,7 @@ class Show extends Component
     #[Computed]
     public function workouts(): LengthAwarePaginator
     {
-        return $this->user->workouts()
-            ->with('exercises.exercise', 'exercises.sets.values.field')
-            ->latest('performed_at')
-            ->latest()
-            ->paginate(10);
+        return $this->workoutRepository->paginatedForUser($this->user);
     }
 
     /**
@@ -58,7 +66,7 @@ class Show extends Component
      */
     public function follow(): void
     {
-        Auth::user()->following()->syncWithoutDetaching([$this->user->id]);
+        $this->userRepository->follow(Auth::user(), $this->user);
 
         unset($this->isFollowing);
 
@@ -70,7 +78,7 @@ class Show extends Component
      */
     public function unfollow(): void
     {
-        Auth::user()->following()->detach($this->user->id);
+        $this->userRepository->unfollow(Auth::user(), $this->user);
 
         unset($this->isFollowing);
 

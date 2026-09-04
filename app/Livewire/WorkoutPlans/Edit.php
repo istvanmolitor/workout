@@ -6,6 +6,8 @@ use App\Models\Exercise;
 use App\Models\Field;
 use App\Models\WorkoutPlan;
 use App\Models\WorkoutPlanExercise;
+use App\Repositories\Contracts\ExerciseRepositoryInterface;
+use App\Repositories\Contracts\WorkoutPlanRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
@@ -17,6 +19,10 @@ use Livewire\Component;
 #[Title('Edzésterv szerkesztése')]
 class Edit extends Component
 {
+    protected ExerciseRepositoryInterface $exerciseRepository;
+
+    protected WorkoutPlanRepositoryInterface $workoutPlanRepository;
+
     #[Locked]
     public WorkoutPlan $workoutPlan;
 
@@ -28,6 +34,12 @@ class Edit extends Component
      * @var array<int, array{exercise_id: int|string, sets: array<int, array{values: array<int, int|string|null>}>}>
      */
     public array $exercises = [];
+
+    public function boot(ExerciseRepositoryInterface $exerciseRepository, WorkoutPlanRepositoryInterface $workoutPlanRepository): void
+    {
+        $this->exerciseRepository = $exerciseRepository;
+        $this->workoutPlanRepository = $workoutPlanRepository;
+    }
 
     /**
      * Mount the component.
@@ -60,7 +72,7 @@ class Edit extends Component
     #[Computed]
     public function availableExercises(): Collection
     {
-        return Exercise::query()->with('exerciseType.fields.field')->orderBy('name')->get();
+        return $this->exerciseRepository->allWithExerciseType();
     }
 
     /**
@@ -186,35 +198,7 @@ class Edit extends Component
             return;
         }
 
-        $this->workoutPlan->update([
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-        ]);
-
-        $this->workoutPlan->exercises()->delete();
-
-        foreach ($this->exercises as $order => $exercise) {
-            $planExercise = $this->workoutPlan->exercises()->create([
-                'exercise_id' => $exercise['exercise_id'],
-                'order' => $order,
-            ]);
-
-            $fieldIds = $this->fieldsForExercise($exercise['exercise_id'])->keys();
-
-            foreach ($exercise['sets'] as $setOrder => $set) {
-                $planSet = $planExercise->sets()->create(['order' => $setOrder]);
-
-                foreach ($fieldIds as $fieldId) {
-                    $value = $set['values'][$fieldId] ?? null;
-
-                    if ($value === null || $value === '') {
-                        continue;
-                    }
-
-                    $planSet->values()->create(['field_id' => $fieldId, 'value' => $value]);
-                }
-            }
-        }
+        $this->workoutPlanRepository->update($this->workoutPlan, $validated['name'], $validated['description'], $this->exercises);
 
         Flux::toast(variant: 'success', text: __('Workout plan updated.'));
 

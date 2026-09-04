@@ -3,6 +3,8 @@
 namespace App\Livewire\WorkoutPlans;
 
 use App\Models\WorkoutPlan;
+use App\Repositories\Contracts\WorkoutPlanRepositoryInterface;
+use App\Repositories\Contracts\WorkoutRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +15,16 @@ use Livewire\Component;
 #[Title('Edzéstervek')]
 class Manage extends Component
 {
+    protected WorkoutPlanRepositoryInterface $workoutPlanRepository;
+
+    protected WorkoutRepositoryInterface $workoutRepository;
+
+    public function boot(WorkoutPlanRepositoryInterface $workoutPlanRepository, WorkoutRepositoryInterface $workoutRepository): void
+    {
+        $this->workoutPlanRepository = $workoutPlanRepository;
+        $this->workoutRepository = $workoutRepository;
+    }
+
     /**
      * Get the authenticated user's workout plans.
      *
@@ -21,7 +33,7 @@ class Manage extends Component
     #[Computed]
     public function workoutPlans(): Collection
     {
-        return Auth::user()->workoutPlans()->with('exercises.exercise', 'exercises.sets.values.field')->latest()->get();
+        return $this->workoutPlanRepository->forUser(Auth::user());
     }
 
     /**
@@ -31,31 +43,7 @@ class Manage extends Component
     {
         $this->authorize('view', $workoutPlan);
 
-        $workout = Auth::user()->workouts()->create([
-            'workout_plan_id' => $workoutPlan->id,
-            'name' => $workoutPlan->name,
-            'performed_at' => now()->toDateString(),
-        ]);
-
-        $workoutPlan->load('exercises.sets.values');
-
-        foreach ($workoutPlan->exercises as $planExercise) {
-            $workoutExercise = $workout->exercises()->create([
-                'exercise_id' => $planExercise->exercise_id,
-                'order' => $planExercise->order,
-            ]);
-
-            foreach ($planExercise->sets as $planSet) {
-                $workoutSet = $workoutExercise->sets()->create(['order' => $planSet->order]);
-
-                foreach ($planSet->values as $planValue) {
-                    $workoutSet->values()->create([
-                        'field_id' => $planValue->field_id,
-                        'value' => $planValue->value,
-                    ]);
-                }
-            }
-        }
+        $workout = $this->workoutRepository->createFromPlan(Auth::user(), $workoutPlan);
 
         $this->redirectRoute('workouts.perform', $workout, navigate: true);
     }
@@ -67,7 +55,7 @@ class Manage extends Component
     {
         $this->authorize('delete', $workoutPlan);
 
-        $workoutPlan->delete();
+        $this->workoutPlanRepository->delete($workoutPlan);
 
         unset($this->workoutPlans);
 

@@ -3,6 +3,7 @@
 namespace App\Livewire\Workouts;
 
 use App\Models\Workout;
+use App\Repositories\Contracts\WorkoutRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,13 @@ use Livewire\Component;
 #[Title('Edzések')]
 class Manage extends Component
 {
+    protected WorkoutRepositoryInterface $workoutRepository;
+
+    public function boot(WorkoutRepositoryInterface $workoutRepository): void
+    {
+        $this->workoutRepository = $workoutRepository;
+    }
+
     /**
      * Get the authenticated user's logged workouts.
      *
@@ -21,7 +29,7 @@ class Manage extends Component
     #[Computed]
     public function workouts(): Collection
     {
-        return Auth::user()->workouts()->with('exercises.exercise', 'exercises.sets.values.field')->latest('performed_at')->latest()->get();
+        return $this->workoutRepository->forUser(Auth::user());
     }
 
     /**
@@ -31,7 +39,7 @@ class Manage extends Component
     {
         $this->authorize('delete', $workout);
 
-        $workout->delete();
+        $this->workoutRepository->delete($workout);
 
         unset($this->workouts);
 

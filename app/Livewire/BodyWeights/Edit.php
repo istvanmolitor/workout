@@ -3,6 +3,7 @@
 namespace App\Livewire\BodyWeights;
 
 use App\Models\BodyWeight;
+use App\Repositories\Contracts\BodyWeightRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -13,12 +14,19 @@ use Livewire\Component;
 #[Title('Testsúlymérés szerkesztése')]
 class Edit extends Component
 {
+    protected BodyWeightRepositoryInterface $bodyWeightRepository;
+
     #[Locked]
     public BodyWeight $bodyWeight;
 
     public string $weight = '';
 
     public string $measured_at = '';
+
+    public function boot(BodyWeightRepositoryInterface $bodyWeightRepository): void
+    {
+        $this->bodyWeightRepository = $bodyWeightRepository;
+    }
 
     /**
      * Mount the component.
@@ -49,7 +57,7 @@ class Edit extends Component
             ],
         ]);
 
-        $this->bodyWeight->update($validated);
+        $this->bodyWeightRepository->update($this->bodyWeight, $validated);
 
         Flux::toast(variant: 'success', text: __('Body weight entry updated.'));
 

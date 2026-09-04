@@ -2,8 +2,9 @@
 
 namespace App\Livewire\ExerciseTypes;
 
-use App\Models\ExerciseType;
 use App\Models\Field;
+use App\Repositories\Contracts\ExerciseTypeRepositoryInterface;
+use App\Repositories\Contracts\FieldRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
@@ -13,6 +14,10 @@ use Livewire\Component;
 #[Title('Új gyakorlattípus')]
 class Create extends Component
 {
+    protected ExerciseTypeRepositoryInterface $exerciseTypeRepository;
+
+    protected FieldRepositoryInterface $fieldRepository;
+
     public string $name = '';
 
     public bool $single_set = false;
@@ -24,6 +29,12 @@ class Create extends Component
         ['field_id' => ''],
     ];
 
+    public function boot(ExerciseTypeRepositoryInterface $exerciseTypeRepository, FieldRepositoryInterface $fieldRepository): void
+    {
+        $this->exerciseTypeRepository = $exerciseTypeRepository;
+        $this->fieldRepository = $fieldRepository;
+    }
+
     /**
      * Get the fields available to choose from.
      *
@@ -32,7 +43,7 @@ class Create extends Component
     #[Computed]
     public function availableFields(): Collection
     {
-        return Field::query()->orderBy('name')->get();
+        return $this->fieldRepository->all();
     }
 
     /**
@@ -65,17 +76,10 @@ class Create extends Component
             'fields.*.field_id' => ['required', 'integer', 'distinct', 'exists:fields,id'],
         ]);
 
-        $exerciseType = ExerciseType::query()->create([
+        $this->exerciseTypeRepository->create([
             'name' => $validated['name'],
             'single_set' => $validated['single_set'],
-        ]);
-
-        foreach ($validated['fields'] as $order => $field) {
-            $exerciseType->fields()->create([
-                'field_id' => $field['field_id'],
-                'order' => $order,
-            ]);
-        }
+        ], $validated['fields']);
 
         Flux::toast(variant: 'success', text: __('Exercise type created.'));
 

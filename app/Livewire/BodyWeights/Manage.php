@@ -3,6 +3,7 @@
 namespace App\Livewire\BodyWeights;
 
 use App\Models\BodyWeight;
+use App\Repositories\Contracts\BodyWeightRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,13 @@ use Livewire\Component;
 #[Title('Testsúly')]
 class Manage extends Component
 {
+    protected BodyWeightRepositoryInterface $bodyWeightRepository;
+
+    public function boot(BodyWeightRepositoryInterface $bodyWeightRepository): void
+    {
+        $this->bodyWeightRepository = $bodyWeightRepository;
+    }
+
     /**
      * Get the authenticated user's body weight entries.
      *
@@ -21,7 +29,7 @@ class Manage extends Component
     #[Computed]
     public function bodyWeights(): Collection
     {
-        return Auth::user()->bodyWeights()->latest('measured_at')->get();
+        return $this->bodyWeightRepository->forUser(Auth::user());
     }
 
     /**
@@ -31,7 +39,7 @@ class Manage extends Component
     {
         $this->authorize('delete', $bodyWeight);
 
-        $bodyWeight->delete();
+        $this->bodyWeightRepository->delete($bodyWeight);
 
         unset($this->bodyWeights);
 

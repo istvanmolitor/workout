@@ -3,6 +3,7 @@
 namespace App\Livewire\ExerciseCategories;
 
 use App\Models\ExerciseCategory;
+use App\Repositories\Contracts\ExerciseCategoryRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
@@ -12,6 +13,13 @@ use Livewire\Component;
 #[Title('Gyakorlatkategóriák')]
 class Manage extends Component
 {
+    protected ExerciseCategoryRepositoryInterface $exerciseCategoryRepository;
+
+    public function boot(ExerciseCategoryRepositoryInterface $exerciseCategoryRepository): void
+    {
+        $this->exerciseCategoryRepository = $exerciseCategoryRepository;
+    }
+
     /**
      * Get all exercise categories.
      *
@@ -20,7 +28,7 @@ class Manage extends Component
     #[Computed]
     public function exerciseCategories(): Collection
     {
-        return ExerciseCategory::query()->orderBy('name')->get();
+        return $this->exerciseCategoryRepository->all();
     }
 
     /**
@@ -28,7 +36,7 @@ class Manage extends Component
      */
     public function delete(ExerciseCategory $exerciseCategory): void
     {
-        $exerciseCategory->delete();
+        $this->exerciseCategoryRepository->delete($exerciseCategory);
 
         unset($this->exerciseCategories);
 

@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use App\Models\BodyWeight;
 use App\Models\Workout;
+use App\Repositories\Contracts\BodyWeightRepositoryInterface;
+use App\Repositories\Contracts\WorkoutRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -13,17 +15,23 @@ use Livewire\Component;
 #[Title('Vezérlőpult')]
 class Dashboard extends Component
 {
+    protected WorkoutRepositoryInterface $workoutRepository;
+
+    protected BodyWeightRepositoryInterface $bodyWeightRepository;
+
+    public function boot(WorkoutRepositoryInterface $workoutRepository, BodyWeightRepositoryInterface $bodyWeightRepository): void
+    {
+        $this->workoutRepository = $workoutRepository;
+        $this->bodyWeightRepository = $bodyWeightRepository;
+    }
+
     /**
      * Get the authenticated user's most recently logged workout.
      */
     #[Computed]
     public function lastWorkout(): ?Workout
     {
-        return Auth::user()->workouts()
-            ->with('exercises.exercise', 'exercises.sets.values.field')
-            ->latest('performed_at')
-            ->latest()
-            ->first();
+        return $this->workoutRepository->lastForUser(Auth::user());
     }
 
     /**
@@ -34,10 +42,7 @@ class Dashboard extends Component
     #[Computed]
     public function bodyWeights(): EloquentCollection
     {
-        return Auth::user()->bodyWeights()
-            ->latest('measured_at')
-            ->limit(30)
-            ->get()
+        return $this->bodyWeightRepository->recentForUser(Auth::user(), 30)
             ->sortBy('measured_at')
             ->values();
     }

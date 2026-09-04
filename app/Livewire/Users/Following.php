@@ -3,6 +3,7 @@
 namespace App\Livewire\Users;
 
 use App\Models\User;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,13 @@ use Livewire\Component;
 #[Title('Követettek')]
 class Following extends Component
 {
+    protected UserRepositoryInterface $userRepository;
+
+    public function boot(UserRepositoryInterface $userRepository): void
+    {
+        $this->userRepository = $userRepository;
+    }
+
     /**
      * Get the users the authenticated user is following.
      *
@@ -21,7 +29,7 @@ class Following extends Component
     #[Computed]
     public function following(): Collection
     {
-        return Auth::user()->following()->orderBy('name')->get();
+        return $this->userRepository->following(Auth::user());
     }
 
     /**
@@ -29,7 +37,7 @@ class Following extends Component
      */
     public function unfollow(User $user): void
     {
-        Auth::user()->following()->detach($user->id);
+        $this->userRepository->unfollow(Auth::user(), $user);
 
         unset($this->following);
 

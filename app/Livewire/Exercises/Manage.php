@@ -3,6 +3,7 @@
 namespace App\Livewire\Exercises;
 
 use App\Models\Exercise;
+use App\Repositories\Contracts\ExerciseRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
@@ -13,6 +14,13 @@ use Livewire\Component;
 #[Title('Gyakorlatok')]
 class Manage extends Component
 {
+    protected ExerciseRepositoryInterface $exerciseRepository;
+
+    public function boot(ExerciseRepositoryInterface $exerciseRepository): void
+    {
+        $this->exerciseRepository = $exerciseRepository;
+    }
+
     /**
      * Get all exercises in the catalog, grouped by category name.
      *
@@ -21,23 +29,7 @@ class Manage extends Component
     #[Computed]
     public function exercises(): Collection
     {
-        $uncategorized = __('Uncategorized');
-
-        $grouped = Exercise::query()
-            ->with('category', 'exerciseType')
-            ->orderBy('name')
-            ->get()
-            ->groupBy(fn (Exercise $exercise) => $exercise->category?->name ?? $uncategorized);
-
-        $others = $grouped->pull($uncategorized);
-
-        $grouped = $grouped->sortKeys();
-
-        if ($others) {
-            $grouped->put($uncategorized, $others);
-        }
-
-        return $grouped;
+        return $this->exerciseRepository->allGroupedByCategory();
     }
 
     /**
@@ -46,7 +38,7 @@ class Manage extends Component
     public function delete(Exercise $exercise): void
     {
         try {
-            $exercise->delete();
+            $this->exerciseRepository->delete($exercise);
         } catch (QueryException) {
             Flux::toast(variant: 'danger', text: __('This exercise is used in a workout plan and cannot be deleted.'));
 

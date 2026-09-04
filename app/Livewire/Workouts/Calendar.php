@@ -3,6 +3,7 @@
 namespace App\Livewire\Workouts;
 
 use App\Models\Workout;
+use App\Repositories\Contracts\WorkoutRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -14,9 +15,16 @@ use Livewire\Component;
 #[Title('Edzésnaptár')]
 class Calendar extends Component
 {
+    protected WorkoutRepositoryInterface $workoutRepository;
+
     public int $year;
 
     public int $month;
+
+    public function boot(WorkoutRepositoryInterface $workoutRepository): void
+    {
+        $this->workoutRepository = $workoutRepository;
+    }
 
     public function mount(): void
     {
@@ -99,9 +107,7 @@ class Calendar extends Component
         $start = $weeks[0][0];
         $end = $weeks[count($weeks) - 1][6];
 
-        return Auth::user()->workouts()
-            ->whereBetween('performed_at', [$start, $end])
-            ->get()
+        return $this->workoutRepository->betweenDatesForUser(Auth::user(), $start, $end)
             ->groupBy(fn (Workout $workout) => $workout->performed_at->format('Y-m-d'));
     }
 }

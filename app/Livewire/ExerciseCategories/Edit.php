@@ -3,6 +3,7 @@
 namespace App\Livewire\ExerciseCategories;
 
 use App\Models\ExerciseCategory;
+use App\Repositories\Contracts\ExerciseCategoryRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Locked;
@@ -12,10 +13,17 @@ use Livewire\Component;
 #[Title('Gyakorlatkategória szerkesztése')]
 class Edit extends Component
 {
+    protected ExerciseCategoryRepositoryInterface $exerciseCategoryRepository;
+
     #[Locked]
     public ExerciseCategory $exerciseCategory;
 
     public string $name = '';
+
+    public function boot(ExerciseCategoryRepositoryInterface $exerciseCategoryRepository): void
+    {
+        $this->exerciseCategoryRepository = $exerciseCategoryRepository;
+    }
 
     /**
      * Mount the component.
@@ -35,7 +43,7 @@ class Edit extends Component
             'name' => ['required', 'string', 'max:255', Rule::unique('exercise_categories', 'name')->ignore($this->exerciseCategory->id)],
         ]);
 
-        $this->exerciseCategory->update($validated);
+        $this->exerciseCategoryRepository->update($this->exerciseCategory, $validated);
 
         Flux::toast(variant: 'success', text: __('Exercise category updated.'));
 

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\BodyWeights;
 
+use App\Repositories\Contracts\BodyWeightRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -11,9 +12,16 @@ use Livewire\Component;
 #[Title('Új testsúlymérés')]
 class Create extends Component
 {
+    protected BodyWeightRepositoryInterface $bodyWeightRepository;
+
     public string $weight = '';
 
     public string $measured_at = '';
+
+    public function boot(BodyWeightRepositoryInterface $bodyWeightRepository): void
+    {
+        $this->bodyWeightRepository = $bodyWeightRepository;
+    }
 
     /**
      * Mount the component.
@@ -38,7 +46,7 @@ class Create extends Component
             ],
         ]);
 
-        Auth::user()->bodyWeights()->create($validated);
+        $this->bodyWeightRepository->create(Auth::user(), $validated);
 
         Flux::toast(variant: 'success', text: __('Body weight logged.'));
 

@@ -3,6 +3,7 @@
 namespace App\Livewire\Fields;
 
 use App\Models\Field;
+use App\Repositories\Contracts\FieldRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\QueryException;
@@ -13,6 +14,13 @@ use Livewire\Component;
 #[Title('Mezők')]
 class Manage extends Component
 {
+    protected FieldRepositoryInterface $fieldRepository;
+
+    public function boot(FieldRepositoryInterface $fieldRepository): void
+    {
+        $this->fieldRepository = $fieldRepository;
+    }
+
     /**
      * Get all fields in the catalog.
      *
@@ -21,7 +29,7 @@ class Manage extends Component
     #[Computed]
     public function fields(): Collection
     {
-        return Field::query()->orderBy('name')->get();
+        return $this->fieldRepository->all();
     }
 
     /**
@@ -30,7 +38,7 @@ class Manage extends Component
     public function delete(Field $field): void
     {
         try {
-            $field->delete();
+            $this->fieldRepository->delete($field);
         } catch (QueryException) {
             Flux::toast(variant: 'danger', text: __('This field has recorded values and cannot be deleted.'));
 

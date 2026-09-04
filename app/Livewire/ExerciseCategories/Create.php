@@ -2,7 +2,7 @@
 
 namespace App\Livewire\ExerciseCategories;
 
-use App\Models\ExerciseCategory;
+use App\Repositories\Contracts\ExerciseCategoryRepositoryInterface;
 use Flux\Flux;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -10,7 +10,14 @@ use Livewire\Component;
 #[Title('Új gyakorlatkategória')]
 class Create extends Component
 {
+    protected ExerciseCategoryRepositoryInterface $exerciseCategoryRepository;
+
     public string $name = '';
+
+    public function boot(ExerciseCategoryRepositoryInterface $exerciseCategoryRepository): void
+    {
+        $this->exerciseCategoryRepository = $exerciseCategoryRepository;
+    }
 
     /**
      * Create the exercise category.
@@ -21,7 +28,7 @@ class Create extends Component
             'name' => ['required', 'string', 'max:255', 'unique:exercise_categories,name'],
         ]);
 
-        ExerciseCategory::query()->create($validated);
+        $this->exerciseCategoryRepository->create($validated);
 
         Flux::toast(variant: 'success', text: __('Exercise category created.'));
 

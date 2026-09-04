@@ -4,6 +4,8 @@ namespace App\Livewire\WorkoutPlans;
 
 use App\Models\Exercise;
 use App\Models\Field;
+use App\Repositories\Contracts\ExerciseRepositoryInterface;
+use App\Repositories\Contracts\WorkoutPlanRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
@@ -15,6 +17,10 @@ use Livewire\Component;
 #[Title('Új edzésterv')]
 class Create extends Component
 {
+    protected ExerciseRepositoryInterface $exerciseRepository;
+
+    protected WorkoutPlanRepositoryInterface $workoutPlanRepository;
+
     public string $name = '';
 
     public string $description = '';
@@ -26,6 +32,12 @@ class Create extends Component
         ['exercise_id' => '', 'sets' => [['values' => []], ['values' => []], ['values' => []]]],
     ];
 
+    public function boot(ExerciseRepositoryInterface $exerciseRepository, WorkoutPlanRepositoryInterface $workoutPlanRepository): void
+    {
+        $this->exerciseRepository = $exerciseRepository;
+        $this->workoutPlanRepository = $workoutPlanRepository;
+    }
+
     /**
      * Get the exercises available to choose from.
      *
@@ -34,7 +46,7 @@ class Create extends Component
     #[Computed]
     public function availableExercises(): Collection
     {
-        return Exercise::query()->with('exerciseType.fields.field')->orderBy('name')->get();
+        return $this->exerciseRepository->allWithExerciseType();
     }
 
     /**
@@ -158,33 +170,7 @@ class Create extends Component
             return;
         }
 
-        $workoutPlan = Auth::user()->workoutPlans()->create([
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-        ]);
-
-        foreach ($this->exercises as $order => $exercise) {
-            $planExercise = $workoutPlan->exercises()->create([
-                'exercise_id' => $exercise['exercise_id'],
-                'order' => $order,
-            ]);
-
-            $fieldIds = $this->fieldsForExercise($exercise['exercise_id'])->keys();
-
-            foreach ($exercise['sets'] as $setOrder => $set) {
-                $planSet = $planExercise->sets()->create(['order' => $setOrder]);
-
-                foreach ($fieldIds as $fieldId) {
-                    $value = $set['values'][$fieldId] ?? null;
-
-                    if ($value === null || $value === '') {
-                        continue;
-                    }
-
-                    $planSet->values()->create(['field_id' => $fieldId, 'value' => $value]);
-                }
-            }
-        }
+        $this->workoutPlanRepository->create(Auth::user(), $validated['name'], $validated['description'], $this->exercises);
 
         Flux::toast(variant: 'success', text: __('Workout plan created.'));
 

@@ -5,6 +5,9 @@ namespace App\Livewire\Exercises;
 use App\Models\Exercise;
 use App\Models\ExerciseCategory;
 use App\Models\ExerciseType;
+use App\Repositories\Contracts\ExerciseCategoryRepositoryInterface;
+use App\Repositories\Contracts\ExerciseRepositoryInterface;
+use App\Repositories\Contracts\ExerciseTypeRepositoryInterface;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
@@ -16,6 +19,12 @@ use Livewire\Component;
 #[Title('Gyakorlat szerkesztése')]
 class Edit extends Component
 {
+    protected ExerciseRepositoryInterface $exerciseRepository;
+
+    protected ExerciseCategoryRepositoryInterface $exerciseCategoryRepository;
+
+    protected ExerciseTypeRepositoryInterface $exerciseTypeRepository;
+
     #[Locked]
     public Exercise $exercise;
 
@@ -24,6 +33,16 @@ class Edit extends Component
     public ?int $category_id = null;
 
     public ?int $exercise_type_id = null;
+
+    public function boot(
+        ExerciseRepositoryInterface $exerciseRepository,
+        ExerciseCategoryRepositoryInterface $exerciseCategoryRepository,
+        ExerciseTypeRepositoryInterface $exerciseTypeRepository,
+    ): void {
+        $this->exerciseRepository = $exerciseRepository;
+        $this->exerciseCategoryRepository = $exerciseCategoryRepository;
+        $this->exerciseTypeRepository = $exerciseTypeRepository;
+    }
 
     /**
      * Mount the component.
@@ -44,7 +63,7 @@ class Edit extends Component
     #[Computed]
     public function categories(): Collection
     {
-        return ExerciseCategory::query()->orderBy('name')->get();
+        return $this->exerciseCategoryRepository->all();
     }
 
     /**
@@ -55,7 +74,7 @@ class Edit extends Component
     #[Computed]
     public function exerciseTypes(): Collection
     {
-        return ExerciseType::query()->orderBy('name')->get();
+        return $this->exerciseTypeRepository->all();
     }
 
     /**
@@ -69,7 +88,7 @@ class Edit extends Component
             'exercise_type_id' => ['required', 'integer', 'exists:exercise_types,id'],
         ]);
 
-        $this->exercise->update($validated);
+        $this->exerciseRepository->update($this->exercise, $validated);
 
         Flux::toast(variant: 'success', text: __('Exercise updated.'));
 
