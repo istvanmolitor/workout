@@ -25,6 +25,19 @@ class ExerciseCategorySeeder extends Seeder
             'Láb',
             'Kardió',
             'Nyújtás',
+            'Úszás',
+            'Jóga',
+            'Kerékpározás',
+            'Evezés',
+            'Testsúlyos edzés',
+            'Kettlebell edzés',
+            'Ugrókötelezés',
+            'Boksz',
+            'Spinning',
+            'Pilates',
+            'Túrázás',
+            'HIIT',
+            'Görkorcsolyázás',
         ])->each(fn (string $name) => ExerciseCategory::query()->firstOrCreate(['name' => $name]));
     }
 }

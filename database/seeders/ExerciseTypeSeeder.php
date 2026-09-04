@@ -21,6 +21,19 @@ class ExerciseTypeSeeder extends Seeder
             'Kondigép' => ['Idő', 'Táv'],
             'Futás' => ['Táv', 'Idő'],
             'Úszás' => ['Táv', 'Idő'],
+            'Jóga' => ['Idő'],
+            'Kerékpározás' => ['Táv', 'Idő'],
+            'Evezés' => ['Táv', 'Idő'],
+            'Testsúlyos edzés' => ['Ismétlés'],
+            'Kettlebell edzés' => ['Ismétlés', 'Súly'],
+            'Ugrókötelezés' => ['Idő'],
+            'Boksz' => ['Idő'],
+            'Spinning' => ['Idő', 'Táv'],
+            'Pilates' => ['Idő'],
+            'Nyújtás' => ['Idő'],
+            'Túrázás' => ['Táv', 'Idő'],
+            'HIIT' => ['Idő'],
+            'Görkorcsolyázás' => ['Táv', 'Idő'],
         ])->each(function (array $fieldNames, string $typeName) {
             $exerciseType = ExerciseType::query()->firstOrCreate(['name' => $typeName]);
 

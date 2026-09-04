@@ -14,14 +14,30 @@ use Livewire\Component;
 class Manage extends Component
 {
     /**
-     * Get all exercises in the catalog.
+     * Get all exercises in the catalog, grouped by category name.
      *
-     * @return Collection<int, Exercise>
+     * @return Collection<string, Collection<int, Exercise>>
      */
     #[Computed]
     public function exercises(): Collection
     {
-        return Exercise::query()->with('category', 'exerciseType')->orderBy('name')->get();
+        $uncategorized = __('Uncategorized');
+
+        $grouped = Exercise::query()
+            ->with('category', 'exerciseType')
+            ->orderBy('name')
+            ->get()
+            ->groupBy(fn (Exercise $exercise) => $exercise->category?->name ?? $uncategorized);
+
+        $others = $grouped->pull($uncategorized);
+
+        $grouped = $grouped->sortKeys();
+
+        if ($others) {
+            $grouped->put($uncategorized, $others);
+        }
+
+        return $grouped;
     }
 
     /**
