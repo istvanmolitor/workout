@@ -1,6 +1,10 @@
 <section class="w-full">
-    <div>
+    <div class="flex flex-wrap items-center justify-between gap-4">
         <flux:heading size="xl">{{ __('Dashboard') }}</flux:heading>
+
+        <flux:button variant="ghost" icon="calendar-days" :href="route('calendar.index')" wire:navigate>
+            {{ __('Calendar') }}
+        </flux:button>
     </div>
 
     <div class="mt-6">

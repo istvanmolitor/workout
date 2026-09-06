@@ -19,6 +19,12 @@ test('authenticated users can visit the dashboard', function () {
     $response->assertOk();
 });
 
+test('dashboard has a link to the calendar', function () {
+    $this->actingAs(User::factory()->create());
+
+    Livewire::test(Dashboard::class)->assertSeeHtml(route('calendar.index'));
+});
+
 test('dashboard shows the user\'s most recently logged workout', function () {
     $user = User::factory()->create();
     Workout::factory()->for($user)->create([

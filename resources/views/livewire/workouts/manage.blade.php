@@ -5,9 +5,15 @@
             <flux:subheading>{{ __('Review your logged workouts') }}</flux:subheading>
         </div>
 
-        <flux:button variant="ghost" icon="calendar-days" :href="route('calendar.index')" wire:navigate>
-            {{ __('Calendar') }}
-        </flux:button>
+        <div class="flex items-center gap-2">
+            <flux:button variant="ghost" icon="calendar-days" :href="route('calendar.index')" wire:navigate>
+                {{ __('Calendar') }}
+            </flux:button>
+
+            <flux:button variant="primary" icon="plus" :href="route('workout-plans.index')" wire:navigate>
+                {{ __('New workout') }}
+            </flux:button>
+        </div>
     </div>
 
     <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">

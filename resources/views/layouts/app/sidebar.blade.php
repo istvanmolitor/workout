@@ -16,10 +16,6 @@
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
 
-                    <flux:sidebar.item icon="calendar-days" :href="route('calendar.index')" :current="request()->routeIs('calendar.*')" wire:navigate>
-                        {{ __('Calendar') }}
-                    </flux:sidebar.item>
-
                     <flux:sidebar.item icon="scale" :href="route('body-weights.index')" :current="request()->routeIs('body-weights.*')" wire:navigate>
                         {{ __('Body weight') }}
                     </flux:sidebar.item>
@@ -28,11 +24,7 @@
                         {{ __('Sleep') }}
                     </flux:sidebar.item>
 
-                    <flux:sidebar.item icon="clipboard-document-list" :href="route('workout-plans.index')" :current="request()->routeIs('workout-plans.*')" wire:navigate>
-                        {{ __('Workout plans') }}
-                    </flux:sidebar.item>
-
-                    <flux:sidebar.item icon="fire" :href="route('workouts.index')" :current="request()->routeIs('workouts.*')" wire:navigate>
+                    <flux:sidebar.item icon="fire" :href="route('workouts.index')" :current="request()->routeIs('workouts.*', 'workout-plans.*')" wire:navigate>
                         {{ __('Workouts') }}
                     </flux:sidebar.item>
 
