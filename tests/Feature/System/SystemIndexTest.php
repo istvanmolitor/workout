@@ -7,13 +7,13 @@ test('guests are redirected to the login page', function () {
 });
 
 test('system page is displayed', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $this->get(route('system.index'))->assertOk();
 });
 
 test('system page links to the catalog management pages', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $this->get(route('system.index'))
         ->assertSeeHtml(route('exercises.index'))

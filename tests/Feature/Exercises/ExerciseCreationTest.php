@@ -12,13 +12,13 @@ test('guests are redirected to the login page', function () {
 });
 
 test('create exercise page is displayed', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $this->get(route('exercises.create'))->assertOk();
 });
 
 test('authenticated user can create an exercise', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $category = ExerciseCategory::factory()->create();
     $exerciseType = ExerciseType::factory()->create();
@@ -35,7 +35,7 @@ test('authenticated user can create an exercise', function () {
 });
 
 test('exercise name is required', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Livewire::test(Create::class)
         ->set('name', '')
@@ -46,7 +46,7 @@ test('exercise name is required', function () {
 });
 
 test('exercise name must be unique', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Exercise::factory()->create(['name' => 'Bench press']);
 
@@ -59,7 +59,7 @@ test('exercise name must be unique', function () {
 });
 
 test('exercise category is required', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Livewire::test(Create::class)
         ->set('name', 'Bench press')
@@ -70,7 +70,7 @@ test('exercise category is required', function () {
 });
 
 test('exercise type is required', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Livewire::test(Create::class)
         ->set('name', 'Bench press')

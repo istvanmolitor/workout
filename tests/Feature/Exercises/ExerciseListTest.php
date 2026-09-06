@@ -12,13 +12,13 @@ test('guests are redirected to the login page', function () {
 });
 
 test('exercises page is displayed', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $this->get(route('exercises.index'))->assertOk();
 });
 
 test('lists exercises in the catalog', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Exercise::factory()->create(['name' => 'Bench press']);
     Exercise::factory()->create(['name' => 'Lat pulldown']);
@@ -29,7 +29,7 @@ test('lists exercises in the catalog', function () {
 });
 
 test('an unused exercise can be deleted', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exercise = Exercise::factory()->create();
 
@@ -40,7 +40,7 @@ test('an unused exercise can be deleted', function () {
 });
 
 test('an exercise used in a workout plan cannot be deleted', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exercise = Exercise::factory()->create();
     WorkoutPlanExercise::factory()->for(WorkoutPlan::factory())->create(['exercise_id' => $exercise->id]);

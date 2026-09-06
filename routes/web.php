@@ -59,23 +59,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('workouts/{workout}/edit', EditWorkout::class)->name('workouts.edit');
     Route::livewire('workouts/{workout}/perform', PerformWorkout::class)->name('workouts.perform');
 
-    Route::livewire('exercises', ManageExercises::class)->name('exercises.index');
-    Route::livewire('exercises/create', CreateExercise::class)->name('exercises.create');
-    Route::livewire('exercises/{exercise}/edit', EditExercise::class)->name('exercises.edit');
+    Route::middleware(['admin'])->group(function () {
+        Route::livewire('exercises', ManageExercises::class)->name('exercises.index');
+        Route::livewire('exercises/create', CreateExercise::class)->name('exercises.create');
+        Route::livewire('exercises/{exercise}/edit', EditExercise::class)->name('exercises.edit');
 
-    Route::livewire('exercise-categories', ManageExerciseCategories::class)->name('exercise-categories.index');
-    Route::livewire('exercise-categories/create', CreateExerciseCategory::class)->name('exercise-categories.create');
-    Route::livewire('exercise-categories/{exerciseCategory}/edit', EditExerciseCategory::class)->name('exercise-categories.edit');
+        Route::livewire('exercise-categories', ManageExerciseCategories::class)->name('exercise-categories.index');
+        Route::livewire('exercise-categories/create', CreateExerciseCategory::class)->name('exercise-categories.create');
+        Route::livewire('exercise-categories/{exerciseCategory}/edit', EditExerciseCategory::class)->name('exercise-categories.edit');
 
-    Route::livewire('exercise-types', ManageExerciseTypes::class)->name('exercise-types.index');
-    Route::livewire('exercise-types/create', CreateExerciseType::class)->name('exercise-types.create');
-    Route::livewire('exercise-types/{exerciseType}/edit', EditExerciseType::class)->name('exercise-types.edit');
+        Route::livewire('exercise-types', ManageExerciseTypes::class)->name('exercise-types.index');
+        Route::livewire('exercise-types/create', CreateExerciseType::class)->name('exercise-types.create');
+        Route::livewire('exercise-types/{exerciseType}/edit', EditExerciseType::class)->name('exercise-types.edit');
 
-    Route::livewire('fields', ManageFields::class)->name('fields.index');
-    Route::livewire('fields/create', CreateField::class)->name('fields.create');
-    Route::livewire('fields/{field}/edit', EditField::class)->name('fields.edit');
+        Route::livewire('fields', ManageFields::class)->name('fields.index');
+        Route::livewire('fields/create', CreateField::class)->name('fields.create');
+        Route::livewire('fields/{field}/edit', EditField::class)->name('fields.edit');
 
-    Route::livewire('system', SystemIndex::class)->name('system.index');
+        Route::livewire('system', SystemIndex::class)->name('system.index');
+    });
 
     Route::livewire('users', SearchUsers::class)->name('users.index');
     Route::livewire('users/following', FollowingUsers::class)->name('users.following');

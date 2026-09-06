@@ -11,13 +11,13 @@ test('guests are redirected to the login page', function () {
 });
 
 test('create exercise type page is displayed', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $this->get(route('exercise-types.create'))->assertOk();
 });
 
 test('authenticated user can create an exercise type with ordered fields', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $distance = Field::factory()->create(['name' => 'Táv']);
     $time = Field::factory()->create(['name' => 'Idő']);
@@ -39,7 +39,7 @@ test('authenticated user can create an exercise type with ordered fields', funct
 });
 
 test('an exercise type can be marked as single set', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $field = Field::factory()->create();
 
@@ -54,7 +54,7 @@ test('an exercise type can be marked as single set', function () {
 });
 
 test('exercise type name is required', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
     $field = Field::factory()->create();
 
     Livewire::test(Create::class)
@@ -65,7 +65,7 @@ test('exercise type name is required', function () {
 });
 
 test('exercise type name must be unique', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     ExerciseType::factory()->create(['name' => 'Futás']);
     $field = Field::factory()->create();
@@ -78,7 +78,7 @@ test('exercise type name must be unique', function () {
 });
 
 test('at least one field is required', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Livewire::test(Create::class)
         ->set('name', 'Futás')
@@ -88,7 +88,7 @@ test('at least one field is required', function () {
 });
 
 test('the same field cannot be selected twice', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $field = Field::factory()->create();
 

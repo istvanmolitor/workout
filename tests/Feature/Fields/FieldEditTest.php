@@ -12,7 +12,7 @@ test('guests are redirected to the login page', function () {
 });
 
 test('edit field page is displayed', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $field = Field::factory()->create();
 
@@ -20,7 +20,7 @@ test('edit field page is displayed', function () {
 });
 
 test('field name and unit can be updated', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $field = Field::factory()->create(['name' => 'Súly', 'unit' => 'kg']);
 
@@ -38,7 +38,7 @@ test('field name and unit can be updated', function () {
 });
 
 test('field name is required', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $field = Field::factory()->create();
 
@@ -49,7 +49,7 @@ test('field name is required', function () {
 });
 
 test('field name must be unique', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Field::factory()->create(['name' => 'Súly']);
     $field = Field::factory()->create(['name' => 'Táv']);
@@ -61,7 +61,7 @@ test('field name must be unique', function () {
 });
 
 test('field can keep its own name unchanged', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $field = Field::factory()->create(['name' => 'Súly']);
 

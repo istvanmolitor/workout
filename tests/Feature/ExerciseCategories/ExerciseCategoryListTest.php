@@ -11,13 +11,13 @@ test('guests are redirected to the login page', function () {
 });
 
 test('exercise categories page is displayed', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $this->get(route('exercise-categories.index'))->assertOk();
 });
 
 test('lists exercise categories', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     ExerciseCategory::factory()->create(['name' => 'Mell']);
     ExerciseCategory::factory()->create(['name' => 'Váll']);
@@ -28,7 +28,7 @@ test('lists exercise categories', function () {
 });
 
 test('an exercise category can be deleted', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseCategory = ExerciseCategory::factory()->create();
 
@@ -39,7 +39,7 @@ test('an exercise category can be deleted', function () {
 });
 
 test('deleting a category used by exercises unassigns it from them', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseCategory = ExerciseCategory::factory()->create();
     $exercise = Exercise::factory()->create(['category_id' => $exerciseCategory->id]);

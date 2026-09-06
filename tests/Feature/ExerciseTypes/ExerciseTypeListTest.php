@@ -13,13 +13,13 @@ test('guests are redirected to the login page', function () {
 });
 
 test('exercise types page is displayed', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $this->get(route('exercise-types.index'))->assertOk();
 });
 
 test('lists exercise types with their fields', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseType = ExerciseType::factory()->create(['name' => 'Futás']);
     $field = Field::factory()->create(['name' => 'Táv']);
@@ -31,7 +31,7 @@ test('lists exercise types with their fields', function () {
 });
 
 test('an unused exercise type can be deleted', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseType = ExerciseType::factory()->create();
 
@@ -42,7 +42,7 @@ test('an unused exercise type can be deleted', function () {
 });
 
 test('deleting an exercise type removes its field associations', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseType = ExerciseType::factory()->create();
     ExerciseTypeField::factory()->create(['exercise_type_id' => $exerciseType->id]);
@@ -53,7 +53,7 @@ test('deleting an exercise type removes its field associations', function () {
 });
 
 test('an exercise type used by an exercise cannot be deleted', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseType = ExerciseType::factory()->create();
     Exercise::factory()->create(['exercise_type_id' => $exerciseType->id]);

@@ -28,22 +28,8 @@
                         {{ __('Workouts') }}
                     </flux:sidebar.item>
 
-                    <flux:sidebar.item icon="squares-2x2" :href="route('system.index')" :current="request()->routeIs('system.*', 'exercises.*', 'exercise-categories.*', 'exercise-types.*', 'fields.*')" wire:navigate>
-                        {{ __('System') }}
-                    </flux:sidebar.item>
-                </flux:sidebar.group>
-
-                <flux:sidebar.group :heading="__('Community')" class="grid">
-                    <flux:sidebar.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.index')" wire:navigate>
-                        {{ __('Users') }}
-                    </flux:sidebar.item>
-
                     <flux:sidebar.item icon="user-plus" :href="route('users.following')" :current="request()->routeIs('users.following')" wire:navigate>
                         {{ __('Following') }}
-                    </flux:sidebar.item>
-
-                    <flux:sidebar.item icon="rss" :href="route('workouts.feed')" :current="request()->routeIs('workouts.feed')" wire:navigate>
-                        {{ __('Followed workouts') }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
@@ -94,6 +80,12 @@
                         <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
                             {{ __('Settings') }}
                         </flux:menu.item>
+
+                        @if (auth()->user()->isAdmin())
+                            <flux:menu.item :href="route('system.index')" icon="squares-2x2" wire:navigate>
+                                {{ __('System') }}
+                            </flux:menu.item>
+                        @endif
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />

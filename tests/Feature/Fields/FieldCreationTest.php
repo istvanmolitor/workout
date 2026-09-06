@@ -10,13 +10,13 @@ test('guests are redirected to the login page', function () {
 });
 
 test('create field page is displayed', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $this->get(route('fields.create'))->assertOk();
 });
 
 test('authenticated user can create a field', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Livewire::test(Create::class)
         ->set('name', 'Súly')
@@ -29,7 +29,7 @@ test('authenticated user can create a field', function () {
 });
 
 test('a field can be created without a unit', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Livewire::test(Create::class)
         ->set('name', 'Ismétlés')
@@ -41,7 +41,7 @@ test('a field can be created without a unit', function () {
 });
 
 test('field name is required', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Livewire::test(Create::class)
         ->set('name', '')
@@ -50,7 +50,7 @@ test('field name is required', function () {
 });
 
 test('field name must be unique', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Field::factory()->create(['name' => 'Súly']);
 

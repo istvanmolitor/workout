@@ -10,13 +10,13 @@ test('guests are redirected to the login page', function () {
 });
 
 test('create exercise category page is displayed', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $this->get(route('exercise-categories.create'))->assertOk();
 });
 
 test('authenticated user can create an exercise category', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Livewire::test(Create::class)
         ->set('name', 'Mell')
@@ -28,7 +28,7 @@ test('authenticated user can create an exercise category', function () {
 });
 
 test('exercise category name is required', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Livewire::test(Create::class)
         ->set('name', '')
@@ -37,7 +37,7 @@ test('exercise category name is required', function () {
 });
 
 test('exercise category name must be unique', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     ExerciseCategory::factory()->create(['name' => 'Mell']);
 

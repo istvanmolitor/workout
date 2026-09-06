@@ -14,7 +14,7 @@ test('guests are redirected to the login page', function () {
 });
 
 test('edit exercise page is displayed', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exercise = Exercise::factory()->create();
 
@@ -22,7 +22,7 @@ test('edit exercise page is displayed', function () {
 });
 
 test('exercise name can be updated', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exercise = Exercise::factory()->create(['name' => 'Bench press']);
 
@@ -36,7 +36,7 @@ test('exercise name can be updated', function () {
 });
 
 test('exercise name is required', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exercise = Exercise::factory()->create();
 
@@ -47,7 +47,7 @@ test('exercise name is required', function () {
 });
 
 test('exercise name must be unique', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Exercise::factory()->create(['name' => 'Bench press']);
     $exercise = Exercise::factory()->create(['name' => 'Lat pulldown']);
@@ -59,7 +59,7 @@ test('exercise name must be unique', function () {
 });
 
 test('exercise can keep its own name unchanged', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exercise = Exercise::factory()->create(['name' => 'Bench press']);
 
@@ -70,7 +70,7 @@ test('exercise can keep its own name unchanged', function () {
 });
 
 test('exercise category is required', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exercise = Exercise::factory()->create();
 
@@ -81,7 +81,7 @@ test('exercise category is required', function () {
 });
 
 test('exercise category can be updated', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exercise = Exercise::factory()->create();
     $category = ExerciseCategory::factory()->create();
@@ -95,7 +95,7 @@ test('exercise category can be updated', function () {
 });
 
 test('exercise type is required', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exercise = Exercise::factory()->create();
 
@@ -106,7 +106,7 @@ test('exercise type is required', function () {
 });
 
 test('exercise type can be updated', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exercise = Exercise::factory()->create();
     $exerciseType = ExerciseType::factory()->create();

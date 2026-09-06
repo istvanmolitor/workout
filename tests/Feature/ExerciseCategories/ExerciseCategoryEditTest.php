@@ -12,7 +12,7 @@ test('guests are redirected to the login page', function () {
 });
 
 test('edit exercise category page is displayed', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseCategory = ExerciseCategory::factory()->create();
 
@@ -20,7 +20,7 @@ test('edit exercise category page is displayed', function () {
 });
 
 test('exercise category name can be updated', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseCategory = ExerciseCategory::factory()->create(['name' => 'Mell']);
 
@@ -34,7 +34,7 @@ test('exercise category name can be updated', function () {
 });
 
 test('exercise category name is required', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseCategory = ExerciseCategory::factory()->create();
 
@@ -45,7 +45,7 @@ test('exercise category name is required', function () {
 });
 
 test('exercise category name must be unique', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     ExerciseCategory::factory()->create(['name' => 'Mell']);
     $exerciseCategory = ExerciseCategory::factory()->create(['name' => 'Váll']);
@@ -57,7 +57,7 @@ test('exercise category name must be unique', function () {
 });
 
 test('exercise category can keep its own name unchanged', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseCategory = ExerciseCategory::factory()->create(['name' => 'Mell']);
 

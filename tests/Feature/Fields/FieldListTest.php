@@ -13,13 +13,13 @@ test('guests are redirected to the login page', function () {
 });
 
 test('fields page is displayed', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $this->get(route('fields.index'))->assertOk();
 });
 
 test('lists fields', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Field::factory()->create(['name' => 'Súly', 'unit' => 'kg']);
     Field::factory()->create(['name' => 'Táv', 'unit' => 'km']);
@@ -30,7 +30,7 @@ test('lists fields', function () {
 });
 
 test('an unused field can be deleted', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $field = Field::factory()->create();
 
@@ -41,7 +41,7 @@ test('an unused field can be deleted', function () {
 });
 
 test('deleting a field removes it from the exercise types tracking it', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $field = Field::factory()->create();
     $exerciseType = ExerciseType::factory()->create();
@@ -54,7 +54,7 @@ test('deleting a field removes it from the exercise types tracking it', function
 });
 
 test('a field with recorded values cannot be deleted', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $field = Field::factory()->create();
     WorkoutExerciseSetValue::factory()->create(['field_id' => $field->id]);

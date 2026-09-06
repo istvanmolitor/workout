@@ -14,7 +14,7 @@ test('guests are redirected to the login page', function () {
 });
 
 test('edit exercise type page is displayed', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseType = ExerciseType::factory()->create();
 
@@ -22,7 +22,7 @@ test('edit exercise type page is displayed', function () {
 });
 
 test('owner can update the exercise type name and its fields', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseType = ExerciseType::factory()->create(['name' => 'Futás']);
     $oldField = Field::factory()->create();
@@ -47,7 +47,7 @@ test('owner can update the exercise type name and its fields', function () {
 });
 
 test('exercise type name is required', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseType = ExerciseType::factory()->create();
     ExerciseTypeField::factory()->create(['exercise_type_id' => $exerciseType->id]);
@@ -59,7 +59,7 @@ test('exercise type name is required', function () {
 });
 
 test('exercise type name must be unique', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     ExerciseType::factory()->create(['name' => 'Futás']);
     $exerciseType = ExerciseType::factory()->create(['name' => 'Úszás']);
@@ -72,7 +72,7 @@ test('exercise type name must be unique', function () {
 });
 
 test('the single set flag can be toggled', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseType = ExerciseType::factory()->create(['single_set' => false]);
     ExerciseTypeField::factory()->create(['exercise_type_id' => $exerciseType->id]);
@@ -86,7 +86,7 @@ test('the single set flag can be toggled', function () {
 });
 
 test('exercise type can keep its own name unchanged', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     $exerciseType = ExerciseType::factory()->create(['name' => 'Futás']);
     ExerciseTypeField::factory()->create(['exercise_type_id' => $exerciseType->id]);
