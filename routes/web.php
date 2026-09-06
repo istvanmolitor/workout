@@ -21,6 +21,7 @@ use App\Livewire\Fields\Manage as ManageFields;
 use App\Livewire\Sleeps\Create as CreateSleep;
 use App\Livewire\Sleeps\Edit as EditSleep;
 use App\Livewire\Sleeps\Manage as ManageSleeps;
+use App\Livewire\System\Index as SystemIndex;
 use App\Livewire\Users\Following as FollowingUsers;
 use App\Livewire\Users\Search as SearchUsers;
 use App\Livewire\Users\Show as ShowUser;
@@ -73,6 +74,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('fields', ManageFields::class)->name('fields.index');
     Route::livewire('fields/create', CreateField::class)->name('fields.create');
     Route::livewire('fields/{field}/edit', EditField::class)->name('fields.edit');
+
+    Route::livewire('system', SystemIndex::class)->name('system.index');
 
     Route::livewire('users', SearchUsers::class)->name('users.index');
     Route::livewire('users/following', FollowingUsers::class)->name('users.following');

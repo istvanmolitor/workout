@@ -36,20 +36,8 @@
                         {{ __('Workouts') }}
                     </flux:sidebar.item>
 
-                    <flux:sidebar.item icon="list-bullet" :href="route('exercises.index')" :current="request()->routeIs('exercises.*')" wire:navigate>
-                        {{ __('Exercises') }}
-                    </flux:sidebar.item>
-
-                    <flux:sidebar.item icon="tag" :href="route('exercise-categories.index')" :current="request()->routeIs('exercise-categories.*')" wire:navigate>
-                        {{ __('Exercise categories') }}
-                    </flux:sidebar.item>
-
-                    <flux:sidebar.item icon="squares-2x2" :href="route('exercise-types.index')" :current="request()->routeIs('exercise-types.*')" wire:navigate>
-                        {{ __('Exercise types') }}
-                    </flux:sidebar.item>
-
-                    <flux:sidebar.item icon="variable" :href="route('fields.index')" :current="request()->routeIs('fields.*')" wire:navigate>
-                        {{ __('Fields') }}
+                    <flux:sidebar.item icon="squares-2x2" :href="route('system.index')" :current="request()->routeIs('system.*', 'exercises.*', 'exercise-categories.*', 'exercise-types.*', 'fields.*')" wire:navigate>
+                        {{ __('System') }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
 
