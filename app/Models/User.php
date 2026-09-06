@@ -107,6 +107,16 @@ class User extends Authenticatable implements PasskeyUser
     }
 
     /**
+     * Get the sleep entries logged by the user.
+     *
+     * @return HasMany<Sleep, $this>
+     */
+    public function sleeps(): HasMany
+    {
+        return $this->hasMany(Sleep::class);
+    }
+
+    /**
      * Get the users this user follows.
      *
      * @return BelongsToMany<User, $this>

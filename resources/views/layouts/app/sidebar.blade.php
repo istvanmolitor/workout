@@ -20,6 +20,10 @@
                         {{ __('Body weight') }}
                     </flux:sidebar.item>
 
+                    <flux:sidebar.item icon="moon" :href="route('sleeps.index')" :current="request()->routeIs('sleeps.*')" wire:navigate>
+                        {{ __('Sleep') }}
+                    </flux:sidebar.item>
+
                     <flux:sidebar.item icon="clipboard-document-list" :href="route('workout-plans.index')" :current="request()->routeIs('workout-plans.*')" wire:navigate>
                         {{ __('Workout plans') }}
                     </flux:sidebar.item>

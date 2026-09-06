@@ -16,6 +16,9 @@ use App\Livewire\ExerciseTypes\Manage as ManageExerciseTypes;
 use App\Livewire\Fields\Create as CreateField;
 use App\Livewire\Fields\Edit as EditField;
 use App\Livewire\Fields\Manage as ManageFields;
+use App\Livewire\Sleeps\Create as CreateSleep;
+use App\Livewire\Sleeps\Edit as EditSleep;
+use App\Livewire\Sleeps\Manage as ManageSleeps;
 use App\Livewire\Users\Following as FollowingUsers;
 use App\Livewire\Users\Search as SearchUsers;
 use App\Livewire\Users\Show as ShowUser;
@@ -37,6 +40,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('body-weights', ManageBodyWeights::class)->name('body-weights.index');
     Route::livewire('body-weights/create', CreateBodyWeight::class)->name('body-weights.create');
     Route::livewire('body-weights/{bodyWeight}/edit', EditBodyWeight::class)->name('body-weights.edit');
+
+    Route::livewire('sleeps', ManageSleeps::class)->name('sleeps.index');
+    Route::livewire('sleeps/create', CreateSleep::class)->name('sleeps.create');
+    Route::livewire('sleeps/{sleep}/edit', EditSleep::class)->name('sleeps.edit');
 
     Route::livewire('workout-plans', ManageWorkoutPlans::class)->name('workout-plans.index');
     Route::livewire('workout-plans/create', CreateWorkoutPlan::class)->name('workout-plans.create');
