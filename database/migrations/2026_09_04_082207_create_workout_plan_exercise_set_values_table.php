@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('workout_plan_exercise_set_values', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('workout_plan_exercise_set_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('workout_plan_exercise_set_id')->constrained(indexName: 'wpes_values_set_id_foreign')->cascadeOnDelete();
             $table->foreignId('field_id')->constrained()->restrictOnDelete();
             $table->decimal('value', 8, 2)->nullable();
             $table->timestamps();
