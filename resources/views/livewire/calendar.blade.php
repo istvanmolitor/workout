@@ -1,7 +1,7 @@
 <section class="w-full">
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
-            <flux:heading size="xl">{{ __('Workout calendar') }}</flux:heading>
+            <flux:heading size="xl">{{ __('Calendar') }}</flux:heading>
             <flux:subheading>{{ $this->monthLabel }}</flux:subheading>
         </div>
 
@@ -37,15 +37,17 @@
                             'bg-neutral-50 dark:bg-neutral-900' => ! $isCurrentMonth,
                         ])
                     >
-                        <span
-                            @class([
-                                'text-sm',
-                                'text-neutral-400 dark:text-neutral-600' => ! $isCurrentMonth,
-                                'font-semibold text-white flex size-6 items-center justify-center rounded-full bg-red-500' => $day->isToday(),
-                            ])
-                        >
-                            {{ $day->day }}
-                        </span>
+                        <a href="{{ route('calendar.show', $day->format('Y-m-d')) }}" wire:navigate>
+                            <span
+                                @class([
+                                    'text-sm',
+                                    'text-neutral-400 dark:text-neutral-600' => ! $isCurrentMonth,
+                                    'font-semibold text-white flex size-6 items-center justify-center rounded-full bg-red-500' => $day->isToday(),
+                                ])
+                            >
+                                {{ $day->day }}
+                            </span>
+                        </a>
 
                         <div class="mt-1 space-y-1">
                             @foreach ($dayWorkouts as $workout)

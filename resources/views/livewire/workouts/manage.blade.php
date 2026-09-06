@@ -5,7 +5,7 @@
             <flux:subheading>{{ __('Review your logged workouts') }}</flux:subheading>
         </div>
 
-        <flux:button variant="ghost" icon="calendar-days" :href="route('workouts.calendar')" wire:navigate>
+        <flux:button variant="ghost" icon="calendar-days" :href="route('calendar.index')" wire:navigate>
             {{ __('Calendar') }}
         </flux:button>
     </div>

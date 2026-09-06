@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Workouts;
+namespace App\Livewire\Calendar;
 
 use App\Models\Workout;
 use App\Repositories\Contracts\WorkoutRepositoryInterface;
@@ -12,8 +12,8 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Edzésnaptár')]
-class Calendar extends Component
+#[Title('Naptár')]
+class Index extends Component
 {
     protected WorkoutRepositoryInterface $workoutRepository;
 

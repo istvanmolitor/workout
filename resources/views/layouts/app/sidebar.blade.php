@@ -16,6 +16,10 @@
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
 
+                    <flux:sidebar.item icon="calendar-days" :href="route('calendar.index')" :current="request()->routeIs('calendar.*')" wire:navigate>
+                        {{ __('Calendar') }}
+                    </flux:sidebar.item>
+
                     <flux:sidebar.item icon="scale" :href="route('body-weights.index')" :current="request()->routeIs('body-weights.*')" wire:navigate>
                         {{ __('Body weight') }}
                     </flux:sidebar.item>

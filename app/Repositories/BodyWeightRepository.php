@@ -6,12 +6,18 @@ use App\Models\BodyWeight;
 use App\Models\User;
 use App\Repositories\Contracts\BodyWeightRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
 
 class BodyWeightRepository implements BodyWeightRepositoryInterface
 {
     public function forUser(User $user): Collection
     {
         return $user->bodyWeights()->latest('measured_at')->get();
+    }
+
+    public function forUserOnDate(User $user, Carbon $date): ?BodyWeight
+    {
+        return $user->bodyWeights()->whereDate('measured_at', $date)->first();
     }
 
     public function recentForUser(User $user, int $limit): Collection

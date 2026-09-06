@@ -1,21 +1,21 @@
 <?php
 
-use App\Livewire\Workouts\Calendar;
+use App\Livewire\Calendar\Index;
 use App\Models\User;
 use App\Models\Workout;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 
 test('guests are redirected to the login page', function () {
-    $response = $this->get(route('workouts.calendar'));
+    $response = $this->get(route('calendar.index'));
     $response->assertRedirect(route('login'));
 });
 
-test('authenticated users can visit the workout calendar', function () {
+test('authenticated users can visit the calendar', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $response = $this->get(route('workouts.calendar'));
+    $response = $this->get(route('calendar.index'));
     $response->assertOk();
 });
 
@@ -28,7 +28,7 @@ test('calendar shows the current month\'s workouts', function () {
 
     $this->actingAs($user);
 
-    Livewire::test(Calendar::class)->assertSee('Push day');
+    Livewire::test(Index::class)->assertSee('Push day');
 
     expect($workout->performed_at->isSameMonth(now()))->toBeTrue();
 });
@@ -48,7 +48,7 @@ test('calendar only shows the user\'s own workouts', function () {
 
     $this->actingAs($user);
 
-    Livewire::test(Calendar::class)
+    Livewire::test(Index::class)
         ->assertSee('My workout')
         ->assertDontSee('Someone else\'s workout');
 });
@@ -62,7 +62,7 @@ test('calendar does not show workouts from other months', function () {
 
     $this->actingAs($user);
 
-    Livewire::test(Calendar::class)->assertDontSee('Last month\'s workout');
+    Livewire::test(Index::class)->assertDontSee('Last month\'s workout');
 });
 
 test('user can navigate to the previous and next month', function () {
@@ -74,7 +74,7 @@ test('user can navigate to the previous and next month', function () {
 
     $this->actingAs($user);
 
-    Livewire::test(Calendar::class)
+    Livewire::test(Index::class)
         ->assertDontSee('Last month\'s workout')
         ->call('previousMonth')
         ->assertSee('Last month\'s workout')
@@ -88,9 +88,17 @@ test('user can jump back to the current month', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    Livewire::test(Calendar::class)
+    Livewire::test(Index::class)
         ->call('previousMonth')
         ->call('goToToday')
         ->assertSet('year', Carbon::now()->year)
         ->assertSet('month', Carbon::now()->month);
+});
+
+test('calendar links each day to the day view', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    Livewire::test(Index::class)
+        ->assertSeeHtml(route('calendar.show', now()->toDateString()));
 });

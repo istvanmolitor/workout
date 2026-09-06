@@ -3,6 +3,8 @@
 use App\Livewire\BodyWeights\Create as CreateBodyWeight;
 use App\Livewire\BodyWeights\Edit as EditBodyWeight;
 use App\Livewire\BodyWeights\Manage as ManageBodyWeights;
+use App\Livewire\Calendar\Index as CalendarIndex;
+use App\Livewire\Calendar\Show as CalendarShow;
 use App\Livewire\Dashboard;
 use App\Livewire\ExerciseCategories\Create as CreateExerciseCategory;
 use App\Livewire\ExerciseCategories\Edit as EditExerciseCategory;
@@ -25,7 +27,6 @@ use App\Livewire\Users\Show as ShowUser;
 use App\Livewire\WorkoutPlans\Create as CreateWorkoutPlan;
 use App\Livewire\WorkoutPlans\Edit as EditWorkoutPlan;
 use App\Livewire\WorkoutPlans\Manage as ManageWorkoutPlans;
-use App\Livewire\Workouts\Calendar as WorkoutCalendar;
 use App\Livewire\Workouts\Edit as EditWorkout;
 use App\Livewire\Workouts\Feed as WorkoutFeed;
 use App\Livewire\Workouts\Manage as ManageWorkouts;
@@ -36,6 +37,9 @@ Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('dashboard', Dashboard::class)->name('dashboard');
+
+    Route::livewire('calendar', CalendarIndex::class)->name('calendar.index');
+    Route::livewire('calendar/{date}', CalendarShow::class)->name('calendar.show');
 
     Route::livewire('body-weights', ManageBodyWeights::class)->name('body-weights.index');
     Route::livewire('body-weights/create', CreateBodyWeight::class)->name('body-weights.create');
@@ -50,7 +54,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('workout-plans/{workoutPlan}/edit', EditWorkoutPlan::class)->name('workout-plans.edit');
 
     Route::livewire('workouts', ManageWorkouts::class)->name('workouts.index');
-    Route::livewire('workouts/calendar', WorkoutCalendar::class)->name('workouts.calendar');
     Route::livewire('workouts/feed', WorkoutFeed::class)->name('workouts.feed');
     Route::livewire('workouts/{workout}/edit', EditWorkout::class)->name('workouts.edit');
     Route::livewire('workouts/{workout}/perform', PerformWorkout::class)->name('workouts.perform');

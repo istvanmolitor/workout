@@ -5,6 +5,7 @@ namespace App\Repositories\Contracts;
 use App\Models\BodyWeight;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
 
 interface BodyWeightRepositoryInterface
 {
@@ -14,6 +15,11 @@ interface BodyWeightRepositoryInterface
      * @return Collection<int, BodyWeight>
      */
     public function forUser(User $user): Collection;
+
+    /**
+     * Get the user's body weight entry measured on the given date, if any.
+     */
+    public function forUserOnDate(User $user, Carbon $date): ?BodyWeight;
 
     /**
      * Get the user's most recent body weight entries, most recently measured first.

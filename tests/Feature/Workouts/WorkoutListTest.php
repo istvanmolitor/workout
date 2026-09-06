@@ -21,7 +21,7 @@ test('workouts page is displayed', function () {
 test('workouts page has a link to the calendar', function () {
     $this->actingAs(User::factory()->create());
 
-    Livewire::test(Manage::class)->assertSeeHtml(route('workouts.calendar'));
+    Livewire::test(Manage::class)->assertSeeHtml(route('calendar.index'));
 });
 
 test('user only sees their own workouts', function () {
