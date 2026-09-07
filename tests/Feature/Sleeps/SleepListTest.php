@@ -15,6 +15,12 @@ test('sleep list page is displayed', function () {
     $this->get(route('sleeps.index'))->assertOk();
 });
 
+test('sleep list page links back to the dashboard', function () {
+    $this->actingAs(User::factory()->create());
+
+    Livewire::test(Manage::class)->assertSeeHtml(route('dashboard'));
+});
+
 test('user only sees their own sleep entries', function () {
     $user = User::factory()->create();
     $otherUser = User::factory()->create();

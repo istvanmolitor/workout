@@ -9,12 +9,10 @@ use App\Models\WorkoutExerciseSetValue;
 use App\Repositories\Contracts\WorkoutRepositoryInterface;
 use Flux\Flux;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Layout('layouts::workout')]
 #[Title('Edzés')]
 class Perform extends Component
 {

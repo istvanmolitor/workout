@@ -15,6 +15,12 @@ test('body weight list page is displayed', function () {
     $this->get(route('body-weights.index'))->assertOk();
 });
 
+test('body weight list page links back to the dashboard', function () {
+    $this->actingAs(User::factory()->create());
+
+    Livewire::test(Manage::class)->assertSeeHtml(route('dashboard'));
+});
+
 test('user only sees their own body weight entries', function () {
     $user = User::factory()->create();
     $otherUser = User::factory()->create();

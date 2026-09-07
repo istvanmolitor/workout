@@ -26,6 +26,15 @@ test('dashboard has a link to the calendar', function () {
     Livewire::test(Dashboard::class)->assertSeeHtml(route('calendar.index'));
 });
 
+test('dashboard has mobile quick links to body weight, sleep and workouts', function () {
+    $this->actingAs(User::factory()->create());
+
+    Livewire::test(Dashboard::class)
+        ->assertSeeHtml(route('body-weights.index'))
+        ->assertSeeHtml(route('sleeps.index'))
+        ->assertSeeHtml(route('workouts.index'));
+});
+
 test('dashboard shows the user\'s most recently logged workout', function () {
     $user = User::factory()->create();
     Workout::factory()->for($user)->create([

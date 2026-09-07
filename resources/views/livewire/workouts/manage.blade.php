@@ -1,4 +1,8 @@
 <section class="w-full">
+    <flux:button variant="ghost" icon="arrow-left" class="mb-4 lg:hidden" :href="route('dashboard')" wire:navigate>
+        {{ __('Dashboard') }}
+    </flux:button>
+
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
             <flux:heading size="xl">{{ __('Workouts') }}</flux:heading>

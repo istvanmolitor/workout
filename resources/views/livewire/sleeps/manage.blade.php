@@ -1,4 +1,8 @@
 <section class="w-full max-w-2xl">
+    <flux:button variant="ghost" icon="arrow-left" class="mb-4 lg:hidden" :href="route('dashboard')" wire:navigate>
+        {{ __('Dashboard') }}
+    </flux:button>
+
     <div class="flex items-center justify-between">
         <div>
             <flux:heading size="xl">{{ __('Sleep') }}</flux:heading>

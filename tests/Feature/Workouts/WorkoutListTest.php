@@ -24,6 +24,12 @@ test('workouts page has a link to the calendar', function () {
     Livewire::test(Manage::class)->assertSeeHtml(route('calendar.index'));
 });
 
+test('workouts page links back to the dashboard', function () {
+    $this->actingAs(User::factory()->create());
+
+    Livewire::test(Manage::class)->assertSeeHtml(route('dashboard'));
+});
+
 test('workouts page has a link to start a new workout from a workout plan', function () {
     $this->actingAs(User::factory()->create());
 

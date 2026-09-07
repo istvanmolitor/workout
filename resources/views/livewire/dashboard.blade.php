@@ -7,6 +7,35 @@
         </flux:button>
     </div>
 
+    <div class="mt-4 grid grid-cols-3 gap-3 lg:hidden">
+        <a
+            href="{{ route('body-weights.index') }}"
+            wire:navigate
+            class="flex flex-col items-center gap-2 rounded-xl border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800"
+        >
+            <flux:icon.scale class="size-5 text-zinc-500 dark:text-zinc-400" />
+            <flux:text size="sm">{{ __('Body weight') }}</flux:text>
+        </a>
+
+        <a
+            href="{{ route('sleeps.index') }}"
+            wire:navigate
+            class="flex flex-col items-center gap-2 rounded-xl border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800"
+        >
+            <flux:icon.moon class="size-5 text-zinc-500 dark:text-zinc-400" />
+            <flux:text size="sm">{{ __('Sleep') }}</flux:text>
+        </a>
+
+        <a
+            href="{{ route('workouts.index') }}"
+            wire:navigate
+            class="flex flex-col items-center gap-2 rounded-xl border border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-800"
+        >
+            <flux:icon.fire class="size-5 text-zinc-500 dark:text-zinc-400" />
+            <flux:text size="sm">{{ __('Workouts') }}</flux:text>
+        </a>
+    </div>
+
     <div class="mt-6">
         <flux:heading size="lg">{{ __('Last workout') }}</flux:heading>
 

@@ -1,4 +1,4 @@
-<div class="mx-auto flex min-h-screen w-full max-w-xl flex-col p-4">
+<section class="mx-auto w-full max-w-xl">
     @if ($activeExerciseId === null)
         <div class="flex items-center gap-3">
             <flux:button variant="ghost" icon="x-mark" :href="route('workouts.index')" wire:navigate />
@@ -76,4 +76,4 @@
             </flux:button>
         </form>
     @endif
-</div>
+</section>
