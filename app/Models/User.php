@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\PasskeyUser;
@@ -24,6 +25,10 @@ use Laravel\Fortify\PasskeyAuthenticatable;
  * @property string $email
  * @property string|null $avatar
  * @property bool $is_admin
+ * @property string|null $strava_id
+ * @property string|null $strava_token
+ * @property string|null $strava_refresh_token
+ * @property Carbon|null $strava_token_expires_at
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string|null $two_factor_secret
@@ -34,7 +39,7 @@ use Laravel\Fortify\PasskeyAuthenticatable;
  * @property Carbon|null $updated_at
  */
 #[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
+#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'strava_token', 'strava_refresh_token'])]
 class User extends Authenticatable implements PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
@@ -60,6 +65,7 @@ class User extends Authenticatable implements PasskeyUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'strava_token_expires_at' => 'datetime',
         ];
     }
 
@@ -69,6 +75,46 @@ class User extends Authenticatable implements PasskeyUser
     public function isAdmin(): bool
     {
         return $this->is_admin;
+    }
+
+    /**
+     * Determine whether the user has connected their Strava account.
+     */
+    public function hasStravaConnected(): bool
+    {
+        return $this->strava_id !== null;
+    }
+
+    /**
+     * Get a valid Strava access token for the user, refreshing it first if it has expired.
+     */
+    public function ensureFreshStravaAccessToken(): ?string
+    {
+        if (! $this->hasStravaConnected()) {
+            return null;
+        }
+
+        if ($this->strava_token_expires_at === null || $this->strava_token_expires_at->isFuture()) {
+            return $this->strava_token;
+        }
+
+        $response = Http::asForm()->post('https://www.strava.com/oauth/token', [
+            'client_id' => config('services.strava.client_id'),
+            'client_secret' => config('services.strava.client_secret'),
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $this->strava_refresh_token,
+        ]);
+
+        if ($response->failed()) {
+            return null;
+        }
+
+        $this->strava_token = $response->json('access_token');
+        $this->strava_refresh_token = $response->json('refresh_token');
+        $this->strava_token_expires_at = Carbon::createFromTimestamp($response->json('expires_at'));
+        $this->save();
+
+        return $this->strava_token;
     }
 
     /**

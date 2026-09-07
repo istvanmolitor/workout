@@ -105,4 +105,25 @@
             @endif
         </div>
     </div>
+
+    <div class="mt-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <flux:heading size="lg">{{ __('Strava') }}</flux:heading>
+
+            @unless ($this->stravaAthleteDump)
+                <flux:button variant="ghost" size="sm" icon="link" :href="route('strava.edit')" wire:navigate>
+                    {{ __('Connect Strava') }}
+                </flux:button>
+            @endif
+        </div>
+
+        <div class="mt-4 overflow-hidden rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800">
+            @if ($this->stravaAthleteDump)
+                <pre class="overflow-x-auto text-xs">{{ json_encode($this->stravaAthleteDump, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+            @else
+                <p class="font-medium">{{ __('Strava not connected') }}</p>
+                <flux:text class="mt-1">{{ __('Connect your Strava account in settings to see your raw athlete data here') }}</flux:text>
+            @endif
+        </div>
+    </div>
 </section>

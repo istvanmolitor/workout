@@ -4,6 +4,7 @@ use App\Livewire\Dashboard;
 use App\Models\BodyWeight;
 use App\Models\User;
 use App\Models\Workout;
+use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 
 test('guests are redirected to the login page', function () {
@@ -96,4 +97,50 @@ test('dashboard prompts for a first body weight entry when none are logged', fun
     $this->actingAs($user);
 
     Livewire::test(Dashboard::class)->assertSee(__('No body weight entries yet'));
+});
+
+test('dashboard prompts to connect strava when not connected', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    Livewire::test(Dashboard::class)
+        ->assertSee(__('Strava not connected'))
+        ->assertSeeHtml(route('strava.edit'));
+});
+
+test('dashboard shows the raw strava athlete payload when connected', function () {
+    Http::fake([
+        'www.strava.com/api/v3/athlete' => Http::response(['id' => 123, 'firstname' => 'Jane']),
+    ]);
+
+    $user = User::factory()->create([
+        'strava_id' => '123',
+        'strava_token' => 'valid-token',
+        'strava_refresh_token' => 'valid-refresh-token',
+        'strava_token_expires_at' => now()->addHour(),
+    ]);
+    $this->actingAs($user);
+
+    Livewire::test(Dashboard::class)
+        ->assertSee('"firstname": "Jane"')
+        ->assertDontSee(__('Strava not connected'));
+
+    Http::assertSent(fn ($request) => $request->url() === 'https://www.strava.com/api/v3/athlete'
+        && $request->hasHeader('Authorization', 'Bearer valid-token'));
+});
+
+test('dashboard shows an error when the strava api request fails', function () {
+    Http::fake([
+        'www.strava.com/api/v3/athlete' => Http::response(status: 401),
+    ]);
+
+    $user = User::factory()->create([
+        'strava_id' => '123',
+        'strava_token' => 'expired-token',
+        'strava_refresh_token' => 'valid-refresh-token',
+        'strava_token_expires_at' => now()->addHour(),
+    ]);
+    $this->actingAs($user);
+
+    Livewire::test(Dashboard::class)->assertSee('Strava API request failed');
 });
