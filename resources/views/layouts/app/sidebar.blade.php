@@ -24,6 +24,10 @@
                         {{ __('Sleep') }}
                     </flux:sidebar.item>
 
+                    <flux:sidebar.item icon="cake" :href="route('meals.index')" :current="request()->routeIs('meals.*')" wire:navigate>
+                        {{ __('Meals') }}
+                    </flux:sidebar.item>
+
                     <flux:sidebar.item icon="fire" :href="route('workouts.index')" :current="request()->routeIs('workouts.*', 'workout-plans.*')" wire:navigate>
                         {{ __('Workouts') }}
                     </flux:sidebar.item>

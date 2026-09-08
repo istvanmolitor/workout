@@ -182,6 +182,16 @@ class User extends Authenticatable implements PasskeyUser
     }
 
     /**
+     * Get the meal entries logged by the user.
+     *
+     * @return HasMany<Meal, $this>
+     */
+    public function meals(): HasMany
+    {
+        return $this->hasMany(Meal::class);
+    }
+
+    /**
      * Get the users this user follows.
      *
      * @return BelongsToMany<User, $this>

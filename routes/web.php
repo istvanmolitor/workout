@@ -18,6 +18,12 @@ use App\Livewire\ExerciseTypes\Manage as ManageExerciseTypes;
 use App\Livewire\Fields\Create as CreateField;
 use App\Livewire\Fields\Edit as EditField;
 use App\Livewire\Fields\Manage as ManageFields;
+use App\Livewire\Foods\Create as CreateFood;
+use App\Livewire\Foods\Edit as EditFood;
+use App\Livewire\Foods\Manage as ManageFoods;
+use App\Livewire\Meals\Create as CreateMeal;
+use App\Livewire\Meals\Edit as EditMeal;
+use App\Livewire\Meals\Manage as ManageMeals;
 use App\Livewire\Sleeps\Create as CreateSleep;
 use App\Livewire\Sleeps\Edit as EditSleep;
 use App\Livewire\Sleeps\Manage as ManageSleeps;
@@ -50,6 +56,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('sleeps/create', CreateSleep::class)->name('sleeps.create');
     Route::livewire('sleeps/{sleep}/edit', EditSleep::class)->name('sleeps.edit');
 
+    Route::livewire('meals', ManageMeals::class)->name('meals.index');
+    Route::livewire('meals/create', CreateMeal::class)->name('meals.create');
+    Route::livewire('meals/{meal}/edit', EditMeal::class)->name('meals.edit');
+
     Route::livewire('workout-plans', ManageWorkoutPlans::class)->name('workout-plans.index');
     Route::livewire('workout-plans/create', CreateWorkoutPlan::class)->name('workout-plans.create');
     Route::livewire('workout-plans/{workoutPlan}/edit', EditWorkoutPlan::class)->name('workout-plans.edit');
@@ -75,6 +85,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::livewire('fields', ManageFields::class)->name('fields.index');
         Route::livewire('fields/create', CreateField::class)->name('fields.create');
         Route::livewire('fields/{field}/edit', EditField::class)->name('fields.edit');
+
+        Route::livewire('foods', ManageFoods::class)->name('foods.index');
+        Route::livewire('foods/create', CreateFood::class)->name('foods.create');
+        Route::livewire('foods/{food}/edit', EditFood::class)->name('foods.edit');
 
         Route::livewire('system', SystemIndex::class)->name('system.index');
     });

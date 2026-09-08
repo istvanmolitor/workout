@@ -3,9 +3,11 @@
 namespace App\Livewire\Calendar;
 
 use App\Models\BodyWeight;
+use App\Models\Meal;
 use App\Models\Sleep;
 use App\Models\Workout;
 use App\Repositories\Contracts\BodyWeightRepositoryInterface;
+use App\Repositories\Contracts\MealRepositoryInterface;
 use App\Repositories\Contracts\SleepRepositoryInterface;
 use App\Repositories\Contracts\WorkoutRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
@@ -24,16 +26,20 @@ class Show extends Component
 
     protected SleepRepositoryInterface $sleepRepository;
 
+    protected MealRepositoryInterface $mealRepository;
+
     public string $date;
 
     public function boot(
         WorkoutRepositoryInterface $workoutRepository,
         BodyWeightRepositoryInterface $bodyWeightRepository,
         SleepRepositoryInterface $sleepRepository,
+        MealRepositoryInterface $mealRepository,
     ): void {
         $this->workoutRepository = $workoutRepository;
         $this->bodyWeightRepository = $bodyWeightRepository;
         $this->sleepRepository = $sleepRepository;
+        $this->mealRepository = $mealRepository;
     }
 
     public function mount(string $date): void
@@ -106,5 +112,16 @@ class Show extends Component
     public function sleeps(): Collection
     {
         return $this->sleepRepository->forUserOnDate(Auth::user(), $this->day());
+    }
+
+    /**
+     * Get the authenticated user's meal entries eaten on this day.
+     *
+     * @return Collection<int, Meal>
+     */
+    #[Computed]
+    public function meals(): Collection
+    {
+        return $this->mealRepository->forUserOnDate(Auth::user(), $this->day());
     }
 }

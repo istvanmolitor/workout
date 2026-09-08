@@ -15,6 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->boolean('is_admin')->default(false);
+            $table->string('avatar')->nullable();
+            $table->string('strava_id')->nullable()->unique();
+            $table->text('strava_token')->nullable();
+            $table->text('strava_refresh_token')->nullable();
+            $table->timestamp('strava_token_expires_at')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

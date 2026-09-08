@@ -83,5 +83,37 @@
                 @endforelse
             </div>
         </div>
+
+        <div>
+            <flux:heading size="lg">{{ __('Meals') }}</flux:heading>
+
+            <div class="mt-2 space-y-2">
+                @forelse ($this->meals as $meal)
+                    <flux:card wire:key="meal-{{ $meal->id }}" class="flex items-center justify-between gap-2 py-3">
+                        <div>
+                            <flux:text class="font-medium text-zinc-900 dark:text-white">
+                                {{ $meal->foods->pluck('name')->join(', ') }}
+                            </flux:text>
+                            <flux:text size="sm">
+                                {{ $meal->eaten_at->translatedFormat('H:i') }}
+                                @if ($meal->foods->sum('calories'))
+                                    &middot; {{ __(':calories kcal', ['calories' => $meal->foods->sum('calories')]) }}
+                                @endif
+                            </flux:text>
+                        </div>
+
+                        <flux:button variant="ghost" size="sm" icon="pencil" :href="route('meals.edit', $meal)" wire:navigate />
+                    </flux:card>
+                @empty
+                    <div class="flex items-center justify-between gap-2 p-6 border rounded-lg border-zinc-200 dark:border-zinc-700">
+                        <flux:text>{{ __('No meals logged on this day') }}</flux:text>
+
+                        <flux:button variant="ghost" size="sm" icon="plus" :href="route('meals.create')" wire:navigate>
+                            {{ __('Log meal') }}
+                        </flux:button>
+                    </div>
+                @endforelse
+            </div>
+        </div>
     </div>
 </section>
