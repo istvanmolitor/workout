@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Food;
 use App\Repositories\Contracts\FoodRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class FoodRepository implements FoodRepositoryInterface
@@ -34,14 +35,24 @@ class FoodRepository implements FoodRepositoryInterface
             ?? Food::query()->create(['name' => $name, 'calories' => $calories]);
     }
 
-    public function create(array $data): Food
+    public function create(array $data, array $nutrients = []): Food
     {
-        return Food::query()->create($data);
+        return DB::transaction(function () use ($data, $nutrients): Food {
+            $food = Food::query()->create($data);
+
+            $food->nutrients()->sync($nutrients);
+
+            return $food;
+        });
     }
 
-    public function update(Food $food, array $data): Food
+    public function update(Food $food, array $data, array $nutrients = []): Food
     {
-        $food->update($data);
+        DB::transaction(function () use ($food, $data, $nutrients): void {
+            $food->update($data);
+
+            $food->nutrients()->sync($nutrients);
+        });
 
         return $food;
     }

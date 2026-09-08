@@ -24,6 +24,11 @@ class Create extends Component
      */
     public array $foodIds = [];
 
+    /**
+     * @var array<int, string> food id => quantity eaten, in grams
+     */
+    public array $foodQuantities = [];
+
     public string $foodSearch = '';
 
     public string $newFoodCalories = '';
@@ -81,6 +86,8 @@ class Create extends Component
             $this->foodIds[] = $food->id;
         }
 
+        $this->foodQuantities[$food->id] ??= '';
+
         $this->foodSearch = '';
     }
 
@@ -90,6 +97,8 @@ class Create extends Component
     public function removeFood(int $foodId): void
     {
         $this->foodIds = array_values(array_filter($this->foodIds, fn (int $id) => $id !== $foodId));
+
+        unset($this->foodQuantities[$foodId]);
     }
 
     /**
@@ -124,6 +133,7 @@ class Create extends Component
         $validated = $this->validate([
             'foodIds' => ['required', 'array', 'min:1'],
             'foodIds.*' => ['integer', 'exists:foods,id'],
+            'foodQuantities.*' => ['required', 'numeric', 'min:0', 'max:100000'],
             'eaten_at' => ['required', 'date', 'before_or_equal:now'],
             'type' => ['nullable', 'string', 'in:breakfast,lunch,dinner,snack'],
             'notes' => ['nullable', 'string', 'max:1000'],
@@ -133,10 +143,23 @@ class Create extends Component
             'eaten_at' => $validated['eaten_at'],
             'type' => $validated['type'],
             'notes' => $validated['notes'],
-        ], $validated['foodIds']);
+        ], $this->foodsToSync($validated['foodIds']));
 
         Flux::toast(variant: 'success', text: __('Meal logged.'));
 
         $this->redirectRoute('meals.index', navigate: true);
+    }
+
+    /**
+     * Build the food sync array (food_id => quantity) from the selected food ids.
+     *
+     * @param  array<int, int>  $foodIds
+     * @return array<int, array{quantity: float}>
+     */
+    private function foodsToSync(array $foodIds): array
+    {
+        return collect($foodIds)
+            ->mapWithKeys(fn (int $foodId) => [$foodId => ['quantity' => (float) $this->foodQuantities[$foodId]]])
+            ->all();
     }
 }

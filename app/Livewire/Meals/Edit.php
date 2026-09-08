@@ -28,6 +28,11 @@ class Edit extends Component
      */
     public array $foodIds = [];
 
+    /**
+     * @var array<int, string> food id => quantity eaten, in grams
+     */
+    public array $foodQuantities = [];
+
     public string $foodSearch = '';
 
     public string $newFoodCalories = '';
@@ -53,6 +58,9 @@ class Edit extends Component
 
         $this->meal = $meal;
         $this->foodIds = $meal->foods->pluck('id')->all();
+        $this->foodQuantities = $meal->foods->pluck('pivot.quantity', 'id')
+            ->map(fn ($quantity) => $quantity !== null ? (string) $quantity : '')
+            ->all();
         $this->eaten_at = $meal->eaten_at->format('Y-m-d\TH:i');
         $this->type = (string) $meal->type;
         $this->notes = (string) $meal->notes;
@@ -99,6 +107,8 @@ class Edit extends Component
             $this->foodIds[] = $food->id;
         }
 
+        $this->foodQuantities[$food->id] ??= '';
+
         $this->foodSearch = '';
     }
 
@@ -108,6 +118,8 @@ class Edit extends Component
     public function removeFood(int $foodId): void
     {
         $this->foodIds = array_values(array_filter($this->foodIds, fn (int $id) => $id !== $foodId));
+
+        unset($this->foodQuantities[$foodId]);
     }
 
     /**
@@ -144,6 +156,7 @@ class Edit extends Component
         $validated = $this->validate([
             'foodIds' => ['required', 'array', 'min:1'],
             'foodIds.*' => ['integer', 'exists:foods,id'],
+            'foodQuantities.*' => ['required', 'numeric', 'min:0', 'max:100000'],
             'eaten_at' => ['required', 'date', 'before_or_equal:now'],
             'type' => ['nullable', 'string', 'in:breakfast,lunch,dinner,snack'],
             'notes' => ['nullable', 'string', 'max:1000'],
@@ -153,10 +166,23 @@ class Edit extends Component
             'eaten_at' => $validated['eaten_at'],
             'type' => $validated['type'],
             'notes' => $validated['notes'],
-        ], $validated['foodIds']);
+        ], $this->foodsToSync($validated['foodIds']));
 
         Flux::toast(variant: 'success', text: __('Meal entry updated.'));
 
         $this->redirectRoute('meals.index', navigate: true);
+    }
+
+    /**
+     * Build the food sync array (food_id => quantity) from the selected food ids.
+     *
+     * @param  array<int, int>  $foodIds
+     * @return array<int, array{quantity: float}>
+     */
+    private function foodsToSync(array $foodIds): array
+    {
+        return collect($foodIds)
+            ->mapWithKeys(fn (int $foodId) => [$foodId => ['quantity' => (float) $this->foodQuantities[$foodId]]])
+            ->all();
     }
 }

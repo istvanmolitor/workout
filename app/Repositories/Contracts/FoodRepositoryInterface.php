@@ -27,18 +27,20 @@ interface FoodRepositoryInterface
     public function firstOrCreate(string $name, ?int $calories = null): Food;
 
     /**
-     * Create a food in the catalog.
+     * Create a food in the catalog, together with its nutrient values.
      *
      * @param  array<string, mixed>  $data
+     * @param  array<int, array{value: float}>  $nutrients
      */
-    public function create(array $data): Food;
+    public function create(array $data, array $nutrients = []): Food;
 
     /**
-     * Update a food in the catalog.
+     * Update a food in the catalog and replace its nutrient values.
      *
      * @param  array<string, mixed>  $data
+     * @param  array<int, array{value: float}>  $nutrients
      */
-    public function update(Food $food, array $data): Food;
+    public function update(Food $food, array $data, array $nutrients = []): Food;
 
     /**
      * Delete a food from the catalog.

@@ -10,6 +10,7 @@
             ['route' => 'exercise-types.index', 'icon' => 'squares-2x2', 'label' => __('Exercise types'), 'description' => __('Manage the types that determine which fields exercises track')],
             ['route' => 'fields.index', 'icon' => 'variable', 'label' => __('Fields'), 'description' => __('Manage the trackable fields used by exercise types')],
             ['route' => 'foods.index', 'icon' => 'cake', 'label' => __('Foods'), 'description' => __('Manage the food catalog used when logging meals')],
+            ['route' => 'nutrients.index', 'icon' => 'beaker', 'label' => __('Nutrients'), 'description' => __('Manage the nutrient catalog used for food nutrition tracking')],
         ] as $tile)
             <a href="{{ route($tile['route']) }}" wire:navigate wire:key="tile-{{ $tile['route'] }}">
                 <flux:card class="flex h-full flex-col gap-3 transition hover:border-zinc-300 dark:hover:border-zinc-600">

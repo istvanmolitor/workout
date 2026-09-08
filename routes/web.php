@@ -24,6 +24,9 @@ use App\Livewire\Foods\Manage as ManageFoods;
 use App\Livewire\Meals\Create as CreateMeal;
 use App\Livewire\Meals\Edit as EditMeal;
 use App\Livewire\Meals\Manage as ManageMeals;
+use App\Livewire\Nutrients\Create as CreateNutrient;
+use App\Livewire\Nutrients\Edit as EditNutrient;
+use App\Livewire\Nutrients\Manage as ManageNutrients;
 use App\Livewire\Sleeps\Create as CreateSleep;
 use App\Livewire\Sleeps\Edit as EditSleep;
 use App\Livewire\Sleeps\Manage as ManageSleeps;
@@ -89,6 +92,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::livewire('foods', ManageFoods::class)->name('foods.index');
         Route::livewire('foods/create', CreateFood::class)->name('foods.create');
         Route::livewire('foods/{food}/edit', EditFood::class)->name('foods.edit');
+
+        Route::livewire('nutrients', ManageNutrients::class)->name('nutrients.index');
+        Route::livewire('nutrients/create', CreateNutrient::class)->name('nutrients.create');
+        Route::livewire('nutrients/{nutrient}/edit', EditNutrient::class)->name('nutrients.edit');
 
         Route::livewire('system', SystemIndex::class)->name('system.index');
     });

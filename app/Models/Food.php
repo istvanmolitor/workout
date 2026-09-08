@@ -13,12 +13,15 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property string $name
+ * @property string|null $barcode
  * @property int|null $calories
+ * @property bool $nutrition_synced
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, Meal> $meals
+ * @property-read Collection<int, Nutrient> $nutrients
  */
-#[Fillable(['name', 'calories'])]
+#[Fillable(['name', 'barcode', 'calories', 'nutrition_synced'])]
 class Food extends Model
 {
     /** @use HasFactory<FoodFactory> */
@@ -40,6 +43,7 @@ class Food extends Model
     {
         return [
             'calories' => 'integer',
+            'nutrition_synced' => 'boolean',
         ];
     }
 
@@ -51,5 +55,15 @@ class Food extends Model
     public function meals(): BelongsToMany
     {
         return $this->belongsToMany(Meal::class);
+    }
+
+    /**
+     * Get the nutrient values recorded for this food, per 100g.
+     *
+     * @return BelongsToMany<Nutrient, $this>
+     */
+    public function nutrients(): BelongsToMany
+    {
+        return $this->belongsToMany(Nutrient::class)->withPivot('value')->withTimestamps();
     }
 }

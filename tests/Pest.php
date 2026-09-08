@@ -4,6 +4,7 @@ use App\Models\Exercise;
 use App\Models\ExerciseType;
 use App\Models\ExerciseTypeField;
 use App\Models\Field;
+use App\Models\Nutrient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -78,4 +79,12 @@ function createExerciseWithFields(string $name, array $fieldNames, bool $singleS
 function fieldIdFor(Exercise $exercise, string $fieldName): int
 {
     return $exercise->exerciseType->fields->first(fn ($typeField) => $typeField->field->name === $fieldName)->field_id;
+}
+
+/**
+ * Create a nutrient in the catalog for use in tests.
+ */
+function createNutrient(string $slug, string $name, string $unit = 'g'): Nutrient
+{
+    return Nutrient::query()->firstOrCreate(['slug' => $slug], ['name' => $name, 'unit' => $unit]);
 }

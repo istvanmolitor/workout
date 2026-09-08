@@ -27,17 +27,17 @@ interface MealRepositoryInterface
      * Log a meal entry for the user with the given foods.
      *
      * @param  array<string, mixed>  $data
-     * @param  array<int, int>  $foodIds
+     * @param  array<int, array{quantity: float|null}>  $foods
      */
-    public function create(User $user, array $data, array $foodIds): Meal;
+    public function create(User $user, array $data, array $foods): Meal;
 
     /**
      * Update a meal entry and its foods.
      *
      * @param  array<string, mixed>  $data
-     * @param  array<int, int>  $foodIds
+     * @param  array<int, array{quantity: float|null}>  $foods
      */
-    public function update(Meal $meal, array $data, array $foodIds): Meal;
+    public function update(Meal $meal, array $data, array $foods): Meal;
 
     /**
      * Delete a meal entry.

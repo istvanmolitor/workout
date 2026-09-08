@@ -24,20 +24,20 @@ class MealRepository implements MealRepositoryInterface
             ->get();
     }
 
-    public function create(User $user, array $data, array $foodIds): Meal
+    public function create(User $user, array $data, array $foods): Meal
     {
         $meal = $user->meals()->create($data);
 
-        $meal->foods()->sync($foodIds);
+        $meal->foods()->sync($foods);
 
         return $meal;
     }
 
-    public function update(Meal $meal, array $data, array $foodIds): Meal
+    public function update(Meal $meal, array $data, array $foods): Meal
     {
         $meal->update($data);
 
-        $meal->foods()->sync($foodIds);
+        $meal->foods()->sync($foods);
 
         return $meal;
     }

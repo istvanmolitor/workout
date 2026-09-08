@@ -14,7 +14,22 @@
                         @endif
                     </div>
 
-                    <flux:button type="button" variant="ghost" size="sm" icon="x-mark" wire:click="removeFood({{ $food->id }})" />
+                    <div class="flex items-start gap-2">
+                        <div class="w-28">
+                            <flux:input
+                                wire:model="foodQuantities.{{ $food->id }}"
+                                type="number"
+                                step="any"
+                                min="0"
+                                :placeholder="__('Amount (g)')"
+                                required
+                            />
+
+                            <flux:error name="foodQuantities.{{ $food->id }}" />
+                        </div>
+
+                        <flux:button type="button" variant="ghost" size="sm" icon="x-mark" wire:click="removeFood({{ $food->id }})" />
+                    </div>
                 </flux:card>
             @endforeach
         </div>

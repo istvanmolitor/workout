@@ -1,4 +1,4 @@
-<section class="w-full max-w-lg">
+<section class="w-full max-w-2xl">
     <div class="flex items-center gap-3">
         <flux:button variant="ghost" icon="arrow-left" :href="route('foods.index')" wire:navigate />
 
@@ -12,6 +12,8 @@
         <flux:input wire:model="name" :label="__('Name')" required autofocus />
 
         <flux:input wire:model="calories" type="number" min="0" :label="__('Calories (optional)')" />
+
+        @include('livewire.foods.partials.nutrition-fields')
 
         <div class="flex items-center gap-4">
             <flux:button type="submit" variant="primary">

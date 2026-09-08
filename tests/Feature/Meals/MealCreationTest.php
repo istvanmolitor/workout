@@ -97,6 +97,8 @@ test('authenticated user can log a meal entry with multiple foods', function () 
     Livewire::test(Create::class)
         ->call('addFood', $first)
         ->call('addFood', $second)
+        ->set('foodQuantities.'.$first->id, '100')
+        ->set('foodQuantities.'.$second->id, '50')
         ->set('eaten_at', '2026-09-01T12:30')
         ->set('type', 'lunch')
         ->call('save')
@@ -117,6 +119,47 @@ test('at least one food is required', function () {
         ->set('eaten_at', '2026-09-01T12:30')
         ->call('save')
         ->assertHasErrors(['foodIds' => 'required']);
+});
+
+test('a quantity eaten can be recorded for a food', function () {
+    $user = User::factory()->create();
+    $food = Food::factory()->create();
+    $this->actingAs($user);
+
+    Livewire::test(Create::class)
+        ->call('addFood', $food)
+        ->set('foodQuantities.'.$food->id, '150.5')
+        ->set('eaten_at', '2026-09-01T12:30')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $meal = Meal::query()->where('user_id', $user->id)->first();
+    expect((float) $meal->foods->find($food->id)->pivot->quantity)->toBe(150.5);
+});
+
+test('a quantity is required for each added food', function () {
+    $user = User::factory()->create();
+    $food = Food::factory()->create();
+    $this->actingAs($user);
+
+    Livewire::test(Create::class)
+        ->call('addFood', $food)
+        ->set('eaten_at', '2026-09-01T12:30')
+        ->call('save')
+        ->assertHasErrors(['foodQuantities.'.$food->id => 'required']);
+});
+
+test('quantity must be a valid number', function () {
+    $user = User::factory()->create();
+    $food = Food::factory()->create();
+    $this->actingAs($user);
+
+    Livewire::test(Create::class)
+        ->call('addFood', $food)
+        ->set('foodQuantities.'.$food->id, 'lots')
+        ->set('eaten_at', '2026-09-01T12:30')
+        ->call('save')
+        ->assertHasErrors(['foodQuantities.'.$food->id => 'numeric']);
 });
 
 test('eaten_at is required', function () {
