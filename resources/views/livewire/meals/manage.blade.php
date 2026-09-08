@@ -16,6 +16,10 @@
                 </flux:button>
             @endif
 
+            <flux:button variant="ghost" icon="chart-bar" :href="route('meals.daily')" wire:navigate>
+                {{ __('Daily summary') }}
+            </flux:button>
+
             <flux:button variant="primary" icon="plus" :href="route('meals.create')" wire:navigate>
                 {{ __('Log meal') }}
             </flux:button>

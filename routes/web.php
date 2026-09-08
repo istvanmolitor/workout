@@ -22,6 +22,7 @@ use App\Livewire\Foods\Create as CreateFood;
 use App\Livewire\Foods\Edit as EditFood;
 use App\Livewire\Foods\Manage as ManageFoods;
 use App\Livewire\Meals\Create as CreateMeal;
+use App\Livewire\Meals\Daily as DailyMeals;
 use App\Livewire\Meals\Edit as EditMeal;
 use App\Livewire\Meals\Manage as ManageMeals;
 use App\Livewire\Nutrients\Create as CreateNutrient;
@@ -61,6 +62,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::livewire('meals', ManageMeals::class)->name('meals.index');
     Route::livewire('meals/create', CreateMeal::class)->name('meals.create');
+    Route::livewire('meals/daily/{date?}', DailyMeals::class)->name('meals.daily');
     Route::livewire('meals/{meal}/edit', EditMeal::class)->name('meals.edit');
 
     Route::livewire('workout-plans', ManageWorkoutPlans::class)->name('workout-plans.index');
