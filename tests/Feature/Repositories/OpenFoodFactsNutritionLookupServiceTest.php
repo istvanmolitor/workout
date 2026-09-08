@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Http;
 test('lookup by name maps nutriments from the search endpoint', function () {
     Http::preventStrayRequests();
     Http::fake([
-        'world.openfoodfacts.org/cgi/search.pl*' => Http::response([
-            'products' => [
+        'search.openfoodfacts.org/search*' => Http::response([
+            'hits' => [
                 [
                     'product_name' => 'Zabkása',
                     'nutriments' => [
@@ -60,7 +60,7 @@ test('lookup by name maps nutriments from the search endpoint', function () {
 test('lookup by name returns null when no product is found', function () {
     Http::preventStrayRequests();
     Http::fake([
-        'world.openfoodfacts.org/cgi/search.pl*' => Http::response(['products' => []]),
+        'search.openfoodfacts.org/search*' => Http::response(['hits' => []]),
     ]);
 
     expect((new OpenFoodFactsNutritionLookupService)->lookupByName('Nonexistent food'))->toBeNull();

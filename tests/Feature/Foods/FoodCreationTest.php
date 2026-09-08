@@ -137,8 +137,8 @@ test('fetching nutrition data by name is used when no barcode is given', functio
 
     Http::preventStrayRequests();
     Http::fake([
-        'world.openfoodfacts.org/cgi/search.pl*' => Http::response([
-            'products' => [
+        'search.openfoodfacts.org/search*' => Http::response([
+            'hits' => [
                 ['nutriments' => ['energy-kcal_100g' => 120, 'proteins_100g' => 3]],
             ],
         ]),
@@ -156,7 +156,7 @@ test('fetching nutrition data by name is used when no barcode is given', functio
 test('fetching nutrition data does not mark the food as synced when nothing is found', function () {
     Http::preventStrayRequests();
     Http::fake([
-        'world.openfoodfacts.org/cgi/search.pl*' => Http::response(['products' => []]),
+        'search.openfoodfacts.org/search*' => Http::response(['hits' => []]),
     ]);
 
     $this->actingAs(User::factory()->admin()->create());

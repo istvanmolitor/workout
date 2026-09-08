@@ -11,21 +11,23 @@ use Illuminate\Support\Facades\Http;
  */
 class OpenFoodFactsNutritionLookupService implements NutritionLookupServiceInterface
 {
-    private const SEARCH_URL = 'https://world.openfoodfacts.org/cgi/search.pl';
+    private const SEARCH_URL = 'https://search.openfoodfacts.org/search';
 
     private const PRODUCT_URL = 'https://world.openfoodfacts.org/api/v2/product/%s.json';
 
     private const FIELDS = 'product_name,code,nutriments';
 
+    /**
+     * Look up nutrition data by name using Open Food Facts' search-a-licious API, the
+     * replacement for the deprecated (and now unreliable for anonymous requests) cgi/search.pl.
+     */
     public function lookupByName(string $name): ?array
     {
         $response = Http::timeout(5)->get(self::SEARCH_URL, [
-            'search_terms' => $name,
-            'search_simple' => 1,
-            'action' => 'process',
-            'json' => 1,
+            'q' => $name,
             'page_size' => 1,
-            'lc' => 'hu',
+            'langs' => 'hu',
+            'sort_by' => '-unique_scans_n',
             'fields' => self::FIELDS,
         ]);
 
@@ -33,7 +35,7 @@ class OpenFoodFactsNutritionLookupService implements NutritionLookupServiceInter
             return null;
         }
 
-        $nutriments = $response->json('products.0.nutriments');
+        $nutriments = $response->json('hits.0.nutriments');
 
         return $nutriments === null ? null : $this->mapNutriments($nutriments);
     }
